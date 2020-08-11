@@ -2,14 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2973a0a1-d8db-4be8-978d-6d8674f7664d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/projeto-star-wars-api-go.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/api/handle.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/planet/planet.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/internal/planet/service.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/api/handle.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/api/handle.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/planet/service.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/planet/service.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,8 +37,8 @@
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="ask.go.tool.to.install.GoImportsTaskConsumer" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
@@ -53,7 +50,7 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="go.sdk" />
+    <property name="settings.editor.selected.configurable" value="watcher.settings" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -88,25 +85,29 @@
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
     <state x="819" y="409" width="400" height="334" key="#Go_Modules/72.27.1848.1053@72.27.1848.1053" timestamp="1597083122176" />
-    <state width="1476" height="283" key="GridCell.Tab.0.bottom" timestamp="1597170354659">
+    <state x="855" y="324" width="719" height="459" key="EditFileWatcherDialog" timestamp="1597173827692">
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
-    <state width="1476" height="283" key="GridCell.Tab.0.bottom/72.27.1848.1053@72.27.1848.1053" timestamp="1597170354659" />
-    <state width="1476" height="283" key="GridCell.Tab.0.center" timestamp="1597170354659">
+    <state x="855" y="324" width="719" height="459" key="EditFileWatcherDialog/72.27.1848.1053@72.27.1848.1053" timestamp="1597173827692" />
+    <state width="1476" height="214" key="GridCell.Tab.0.bottom" timestamp="1597174685910">
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
-    <state width="1476" height="283" key="GridCell.Tab.0.center/72.27.1848.1053@72.27.1848.1053" timestamp="1597170354659" />
-    <state width="1476" height="283" key="GridCell.Tab.0.left" timestamp="1597170354659">
+    <state width="1476" height="214" key="GridCell.Tab.0.bottom/72.27.1848.1053@72.27.1848.1053" timestamp="1597174685910" />
+    <state width="1476" height="214" key="GridCell.Tab.0.center" timestamp="1597174685903">
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
-    <state width="1476" height="283" key="GridCell.Tab.0.left/72.27.1848.1053@72.27.1848.1053" timestamp="1597170354659" />
-    <state width="1476" height="283" key="GridCell.Tab.0.right" timestamp="1597170354659">
+    <state width="1476" height="214" key="GridCell.Tab.0.center/72.27.1848.1053@72.27.1848.1053" timestamp="1597174685903" />
+    <state width="1476" height="214" key="GridCell.Tab.0.left" timestamp="1597174685902">
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
-    <state width="1476" height="283" key="GridCell.Tab.0.right/72.27.1848.1053@72.27.1848.1053" timestamp="1597170354659" />
-    <state x="709" y="178" width="1022" height="737" key="SettingsEditor" timestamp="1597083600462">
+    <state width="1476" height="214" key="GridCell.Tab.0.left/72.27.1848.1053@72.27.1848.1053" timestamp="1597174685902" />
+    <state width="1476" height="214" key="GridCell.Tab.0.right" timestamp="1597174685908">
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
-    <state x="709" y="178" width="1022" height="737" key="SettingsEditor/72.27.1848.1053@72.27.1848.1053" timestamp="1597083600462" />
+    <state width="1476" height="214" key="GridCell.Tab.0.right/72.27.1848.1053@72.27.1848.1053" timestamp="1597174685908" />
+    <state x="898" y="181" width="1022" height="737" key="SettingsEditor" timestamp="1597173846691">
+      <screen x="72" y="27" width="1848" height="1053" />
+    </state>
+    <state x="898" y="181" width="1022" height="737" key="SettingsEditor/72.27.1848.1053@72.27.1848.1053" timestamp="1597173846691" />
   </component>
 </project>
