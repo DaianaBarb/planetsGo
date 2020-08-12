@@ -19,11 +19,11 @@ func main() {
 	service := planet.NewService(database)
 	handler := api.NewPlanetHandler(service)
 	router := mux.NewRouter()
-	//router.HandleFunc("/planets/{id}", deletePlanet).Methods("DELETE")
-	//router.HandleFunc("/planets/{id}", updatePlanet).Methods("PUT")
+	router.HandleFunc("/planets/{id}", handler.DeleteById).Methods("DELETE")
+	router.HandleFunc("/planets/{id}", handler.UpdateById).Methods("PUT")
 	router.HandleFunc("/planets", handler.SavePlanet).Methods("POST")
-	router.HandleFunc("/planets", handler.GetPlanets).Methods("GET")
-	//router.HandleFunc("/planets/{id}", returnPlanetId).Methods("GET")
+	router.HandleFunc("/planets", handler.GetAll).Methods("GET")
+	router.HandleFunc("/planets/{id}", handler.FindById).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", router))
 
 }

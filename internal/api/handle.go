@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
 	"projeto-star-wars-api-go/internal/planet"
@@ -34,11 +35,40 @@ func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 
 }
-func (p *PlanetHandler) GetPlanets(w http.ResponseWriter, r *http.Request) {
+func (p *PlanetHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	//ctx, _ := context.WithTimeout(context.Background(), 20*time.Second)
-	var planets []planet.PlanetDocument = p.service.FindAll(context.Background())
+	 planets, err := p.service.FindAll(context.Background())
+
+  if err!=nil{
+  	w.WriteHeader(http.StatusInternalServerError)
+   }
+
 	encoder := json.NewEncoder(w)
 	encoder.Encode(planets)
+	w.WriteHeader(http.StatusOK)
 
+}
+
+func (p *PlanetHandler) FindById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	vars := mux.Vars(r)
+	planet, err := p.service.UpdateById(context.Background(),vars["id"])
+
+	if err!=nil{
+		w.WriteHeader(http.StatusNotFound)
+	}
+	encoder := json.NewEncoder(w)
+	encoder.Encode(planet)
+	w.WriteHeader(http.StatusOK)
+
+}
+func (p *PlanetHandler) DeleteById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+}
+func (p *PlanetHandler) UpdateById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+}
+func (p *PlanetHandler) FindByName(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 }
