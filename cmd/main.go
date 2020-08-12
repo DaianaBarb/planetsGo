@@ -24,7 +24,7 @@ func main() {
 	router.HandleFunc("/planets", handler.SavePlanet).Methods("POST")
 	router.HandleFunc("/planets", handler.GetAll).Methods("GET")
 	router.HandleFunc("/planets/{id}", handler.FindById).Methods("GET")
-	router.HandleFunc("/planets/name/{name}", handler.FindByName).Methods("GET")
+	router.HandleFunc("/planets", handler.FindByName).Methods("GET").Queries("name", "")
 	log.Fatal(http.ListenAndServe(":8080", router))
 
 }

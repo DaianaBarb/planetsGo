@@ -67,8 +67,8 @@ func (p *PlanetHandler) FindById(w http.ResponseWriter, r *http.Request) {
 
 func (p *PlanetHandler) FindByName(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-    vars := mux.Vars(r)
-	planet, err := p.service.FindByName(context.Background(),vars["name"])
+    planetName := r.URL.Query().Get("name")
+	planet, err := p.service.FindByName(context.Background(),planetName)
 
 	  if err!=nil{
 		w.WriteHeader(http.StatusNotFound)
