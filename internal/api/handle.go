@@ -3,11 +3,12 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"projeto-star-wars-api-go/internal/planet"
+
+	"github.com/gorilla/mux"
 )
 
 type PlanetHandler struct {
@@ -39,11 +40,11 @@ func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
 func (p *PlanetHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	//ctx, _ := context.WithTimeout(context.Background(), 20*time.Second)
-	 planets, err := p.service.FindAll(context.Background())
+	planets, err := p.service.FindAll(context.Background())
 
-  if err!=nil{
-  	w.WriteHeader(http.StatusInternalServerError)
-   }
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 
 	encoder := json.NewEncoder(w)
 	encoder.Encode(planets)
@@ -54,9 +55,9 @@ func (p *PlanetHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 func (p *PlanetHandler) FindById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
-	planet, err := p.service.FindById(context.Background(),vars["id"])
+	planet, err := p.service.FindById(context.Background(), vars["id"])
 
-	if err!=nil{
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 	}
 	encoder := json.NewEncoder(w)
@@ -67,10 +68,10 @@ func (p *PlanetHandler) FindById(w http.ResponseWriter, r *http.Request) {
 
 func (p *PlanetHandler) FindByName(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-    planetName := r.URL.Query().Get("name")
-	planet, err := p.service.FindByName(context.Background(),planetName)
+	planetName := r.URL.Query().Get("name")
+	planet, err := p.service.FindByName(context.Background(), planetName)
 
-	  if err!=nil{
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 	}
 	encoder := json.NewEncoder(w)
@@ -80,34 +81,34 @@ func (p *PlanetHandler) FindByName(w http.ResponseWriter, r *http.Request) {
 }
 func (p *PlanetHandler) UpdateById(w http.ResponseWriter, r *http.Request) {
 
-       vars := mux.Vars(r)
-	   var newPlanet planet.PlanetIn
-       err := json.NewDecoder(r.Body).Decode(&newPlanet)
+	vars := mux.Vars(r)
+	var newPlanet planet.PlanetIn
+	err := json.NewDecoder(r.Body).Decode(&newPlanet)
 
-	         		if err != nil {
-	         			log.Println("Error Decoding the planet", err)
-	 	                w.WriteHeader(http.StatusBadRequest)
-						return
-		}
+	if err != nil {
+		log.Println("Error Decoding the planet", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-		planet, err := p.service.UpdateById(context.Background(),newPlanet,vars["id"])
-	               if err != nil{
-	                	log.Println("Error updating the planet", err)
-	                	w.WriteHeader(http.StatusBadRequest)
-	                	return
-				   }
-	     response, err := json.Marshal(planet)
+	planet, err := p.service.UpdateById(context.Background(), newPlanet, vars["id"])
+	if err != nil {
+		log.Println("Error updating the planet", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	response, err := json.Marshal(planet)
 
-	               if err != nil {
-		           log.Println("Error Marshaling the result planet", err)
-	               w.WriteHeader(http.StatusBadRequest)
-		              return
-	               }
+	if err != nil {
+		log.Println("Error Marshaling the result planet", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(response)
-	   if err != nil {
+	if err != nil {
 		log.Println("Error to write the response", err)
 	}
 
@@ -116,10 +117,9 @@ func (p *PlanetHandler) UpdateById(w http.ResponseWriter, r *http.Request) {
 func (p *PlanetHandler) DeleteById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
-	err := p.service.DeleteById(context.Background(),vars["id"])
-	   if err != nil {
+	err := p.service.DeleteById(context.Background(), vars["id"])
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 	}
 	w.WriteHeader(http.StatusOK)
 }
-

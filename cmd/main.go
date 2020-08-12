@@ -14,6 +14,7 @@ import (
 )
 
 func main() {
+
 	fmt.Println("Servidor esta rodando na porta 8080")
 	database := getDatabase()
 	service := planet.NewService(database)
@@ -30,6 +31,7 @@ func main() {
 }
 
 func getDatabase() *mongo.Database {
+
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {

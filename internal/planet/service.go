@@ -2,6 +2,7 @@ package planet
 
 import (
 	"context"
+
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/pkg/errors"
@@ -29,7 +30,7 @@ func (s *Service) Save(ctx context.Context, document *PlanetDocument) error {
 
 	return nil
 }
-func (s *Service) FindAll(ctx context.Context) ([]PlanetDocument,error) {
+func (s *Service) FindAll(ctx context.Context) ([]PlanetDocument, error) {
 
 	result, err := s.planets.Find(ctx, bson.M{})
 	if err != nil { // se o erro nao for nulo
@@ -44,17 +45,16 @@ func (s *Service) FindAll(ctx context.Context) ([]PlanetDocument,error) {
 	return models, nil
 }
 
-
-func (s *Service) DeleteById(ctx context.Context,id string) error {
- oID, err := primitive.ObjectIDFromHex(id)
- if err != nil{
- 	return err
- }
-	_,err = s.planets.DeleteOne(ctx,bson.M{"_id":oID})
+func (s *Service) DeleteById(ctx context.Context, id string) error {
+	oID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	_, err = s.planets.DeleteOne(ctx, bson.M{"_id": oID})
 	return err
 }
 
-func (s *Service) UpdateById(ctx context.Context,p PlanetIn,id string) (*PlanetDocument, error) {
+func (s *Service) UpdateById(ctx context.Context, p PlanetIn, id string) (*PlanetDocument, error) {
 	oID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func (s *Service) UpdateById(ctx context.Context,p PlanetIn,id string) (*PlanetD
 	return &model, nil
 
 }
-func (s *Service) FindById(ctx context.Context,id string) (*PlanetDocument, error) {
+func (s *Service) FindById(ctx context.Context, id string) (*PlanetDocument, error) {
 	//**
 	oID, err := primitive.ObjectIDFromHex(id)
 
@@ -90,7 +90,7 @@ func (s *Service) FindById(ctx context.Context,id string) (*PlanetDocument, erro
 
 	return &model, nil
 }
-func (s *Service) FindByName(ctx context.Context,name string) (*PlanetDocument, error) {
+func (s *Service) FindByName(ctx context.Context, name string) (*PlanetDocument, error) {
 
 	result := s.planets.FindOne(ctx, bson.M{"name": name})
 
