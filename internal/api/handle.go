@@ -53,7 +53,7 @@ func (p *PlanetHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 func (p *PlanetHandler) FindById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
-	planet, err := p.service.UpdateById(context.Background(),vars["id"])
+	planet, err := p.service.FindById(context.Background(),vars["id"])
 
 	if err!=nil{
 		w.WriteHeader(http.StatusNotFound)
