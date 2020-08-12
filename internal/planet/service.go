@@ -2,7 +2,7 @@ package planet
 
 import (
 	"context"
-	"fmt"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
@@ -43,10 +43,40 @@ func (s *Service) FindAll(ctx context.Context) ([]PlanetDocument,error) {
 
 	return models, nil
 }
+
+
+func (s *Service) DeleteById(ctx context.Context,id string) error {
+ oID, err := primitive.ObjectIDFromHex(id)
+ if err != nil{
+ 	return err
+ }
+	_,err = s.planets.DeleteOne(ctx,bson.M{"_id":oID})
+	return err
+}
+
+func (s *Service) UpdateById(ctx context.Context,p PlanetIn,id string) (*PlanetDocument, error) {
+	oID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	model := PlanetDocument{
+		ID:      oID,
+		Name:    p.Name,
+		Climate: p.Climate,
+		Terrain: p.Terrain,
+	}
+	opts := options.Update().SetUpsert(true)
+	_, err = s.planets.UpdateOne(ctx, bson.M{"_id": model.ID}, bson.D{{"$set", model}}, opts)
+	if err != nil {
+		return nil, err
+	}
+	return &model, nil
+
+}
 func (s *Service) FindById(ctx context.Context,id string) (*PlanetDocument, error) {
 	//**
 	oID, err := primitive.ObjectIDFromHex(id)
-	fmt.Println(oID)
+
 	if err != nil {
 		return nil, err
 	}
@@ -60,15 +90,15 @@ func (s *Service) FindById(ctx context.Context,id string) (*PlanetDocument, erro
 
 	return &model, nil
 }
+func (s *Service) FindByName(ctx context.Context,name string) (*PlanetDocument, error) {
 
-func (s *Service) DeleteById(ctx context.Context,id string) (*PlanetDocument, error) {
-	return nil, nil
-}
+	result := s.planets.FindOne(ctx, bson.M{"name": name})
 
-func (s *Service) UpdateById(ctx context.Context,id string) (*PlanetDocument, error) {
-	return nil, nil
-}
+	var model PlanetDocument
+	err := result.Decode(&model)
+	if err != nil {
+		return nil, err
+	}
 
-func (s *Service) FindByName(ctx context.Context,id string) (*PlanetDocument, error) {
-	return nil, nil
+	return &model, nil
 }
