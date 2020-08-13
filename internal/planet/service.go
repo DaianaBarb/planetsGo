@@ -6,7 +6,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -25,14 +24,10 @@ func (s *Service) Save(ctx context.Context, document *PlanetDocument) error {
 	var saw swapi.SWAPI
 	var number int
 	number, err := saw.CountPlanetAppearancesOnMovies(context.Background(), document.Name)
-	if number == 0 {
-
-		return nil
-	}
 	document.NumberOfFilmAppearances = number
 	one, err := s.planets.InsertOne(ctx, document)
 	if err != nil {
-		return errors.Wrap(err, "Erro ao salvar documento")
+		return err
 	}
 
 	document.ID = one.InsertedID.(primitive.ObjectID)
