@@ -38,13 +38,13 @@ func (s *Service) Save(ctx context.Context, document *PlanetDocument) error {
 
 	return nil
 }
-func (s *Service) FindAll(ctx context.Context) ([]PlanetDocument, error) {
+func (s *Service) FindAll(ctx context.Context) ([]PlanetOut, error) {
 
 	result, err := s.planets.Find(ctx, bson.M{})
 	if err != nil { // se o erro nao for nulo
 		return nil, err
 	} // se o erro for igual a a nullo ele n da erro. se o erro for nulo ele da erro
-	var models []PlanetDocument // o erro tem que ser nullo para passar aqui e n retornar erro
+	var models []PlanetOut // o erro tem que ser nullo para passar aqui e n retornar erro
 	err = result.All(ctx, &models)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (s *Service) UpdateById(ctx context.Context, p PlanetIn, id string) (*Plane
 	return &model, nil
 
 }
-func (s *Service) FindById(ctx context.Context, id string) (*PlanetDocument, error) {
+func (s *Service) FindById(ctx context.Context, id string) (*PlanetOut, error) {
 	//**
 	oID, err := primitive.ObjectIDFromHex(id)
 
@@ -90,7 +90,7 @@ func (s *Service) FindById(ctx context.Context, id string) (*PlanetDocument, err
 	}
 	result := s.planets.FindOne(ctx, bson.M{"_id": oID})
 
-	var model PlanetDocument
+	var model PlanetOut
 	err = result.Decode(&model)
 	if err != nil {
 		return nil, err
@@ -99,12 +99,11 @@ func (s *Service) FindById(ctx context.Context, id string) (*PlanetDocument, err
 	var number int
 	number, _ = saw.CountPlanetAppearancesOnMovies(ctx, model.Name)
 	model.NumberOfFilmAppearances = number
-	opts := options.Update().SetUpsert(true)
-	_, err = s.planets.UpdateOne(ctx, bson.M{"_id": model.ID}, bson.D{{"$set", model}}, opts)
+	//opts := options.Update().SetUpsert(true)
+	_, err = s.planets.UpdateOne(ctx, bson.M{"_id": model.ID}, bson.D{{"$set", model}})
 	if err != nil {
 		return nil, err
 	}
-
 	return &model, nil
 }
 func (s *Service) FindByName(ctx context.Context, name string) (*PlanetDocument, error) {
