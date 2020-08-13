@@ -22,7 +22,7 @@ func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	body, error := ioutil.ReadAll(r.Body)
 	if error != nil {
-		//tratar erro
+		w.WriteHeader(http.StatusBadRequest)
 	}
 	var in planet.PlanetIn
 	error = json.Unmarshal(body, &in)
@@ -32,6 +32,15 @@ func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
 
 	document := in.ToDocument()
 	error = p.service.Save(context.Background(), document)
+
+	if error != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if document.NumberOfFilmAppearances == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	url := "http://localhost:8080/planets/" + document.ID.Hex()
 	w.Header().Add("location", url)
 	w.WriteHeader(http.StatusCreated)

@@ -2,6 +2,7 @@ package planet
 
 import (
 	"context"
+	"projeto-star-wars-api-go/swapi"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 
@@ -20,7 +21,14 @@ func NewService(db *mongo.Database) *Service {
 }
 
 func (s *Service) Save(ctx context.Context, document *PlanetDocument) error {
+	var saw swapi.SWAPI
+	var number int
+	number, err := saw.CountPlanetAppearancesOnMovies(context.Background(), document.Name)
+	if number == 0 {
 
+		return nil
+	}
+	document.NumberOfFilmAppearances = number
 	one, err := s.planets.InsertOne(ctx, document)
 	if err != nil {
 		return errors.Wrap(err, "Erro ao salvar documento")
@@ -84,6 +92,15 @@ func (s *Service) FindById(ctx context.Context, id string) (*PlanetDocument, err
 
 	var model PlanetDocument
 	err = result.Decode(&model)
+	if err != nil {
+		return nil, err
+	}
+	var saw swapi.SWAPI
+	var number int
+	number, _ = saw.CountPlanetAppearancesOnMovies(ctx, model.Name)
+	model.NumberOfFilmAppearances = number
+	opts := options.Update().SetUpsert(true)
+	_, err = s.planets.UpdateOne(ctx, bson.M{"_id": model.ID}, bson.D{{"$set", model}}, opts)
 	if err != nil {
 		return nil, err
 	}
