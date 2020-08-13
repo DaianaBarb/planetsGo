@@ -12,9 +12,12 @@ services:
             - "mongo"
     mongo:
         image: mongo
-        container_name: mongo
+        container_name: mongo-star
         environment:
+            MONGO_INITDB_ROOT: 
+            MONGO_INITDB_PASSWORD: 
             MONGO_INITDB_DATABASE: star-wars
+               
         networks:
             - product-network
 

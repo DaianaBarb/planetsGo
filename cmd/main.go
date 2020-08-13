@@ -32,7 +32,7 @@ func main() {
 
 func getDatabase() *mongo.Database {
 
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
+	clientOptions := options.Client().ApplyURI("mongodb://mongo-star")
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		//tratar
