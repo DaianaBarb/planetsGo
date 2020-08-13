@@ -21,6 +21,7 @@ func NewService(db *mongo.Database) *Service {
 }
 
 func (s *Service) Save(ctx context.Context, document *PlanetDocument) error {
+
 	var saw swapi.SWAPI
 	var number int
 	number, err := saw.CountPlanetAppearancesOnMovies(context.Background(), document.Name)

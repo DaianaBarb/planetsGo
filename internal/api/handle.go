@@ -29,6 +29,11 @@ func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
 	if error != nil {
 		w.WriteHeader(http.StatusUnprocessableEntity)
 	}
+	result, _ := p.service.FindByName(context.Background(), in.Name)
+	if result != nil {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 
 	document := in.ToDocument()
 	error = p.service.Save(context.Background(), document)
