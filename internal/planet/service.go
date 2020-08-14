@@ -42,7 +42,16 @@ func (s *Service) FindAll(ctx context.Context) ([]PlanetOut, error) {
 		return nil, err
 	}
 
-	return models, nil
+	var newListModel []PlanetOut
+	for _, model := range models {
+		var saw swapi.SWAPI
+		var number int
+		number, _ = saw.CountPlanetAppearancesOnMovies(ctx, model.Name)
+		model.NumberOfFilmAppearances = number
+		newListModel = append(newListModel, model)
+	}
+
+	return newListModel, nil
 }
 
 func (s *Service) DeleteById(ctx context.Context, id string) error {
@@ -91,25 +100,28 @@ func (s *Service) FindById(ctx context.Context, id string) (*PlanetOut, error) {
 	var number int
 	number, _ = saw.CountPlanetAppearancesOnMovies(ctx, model.Name)
 	model.NumberOfFilmAppearances = number
-	//opts := options.Update().SetUpsert(true)
-	_, err = s.planets.UpdateOne(ctx, bson.M{"_id": model.ID}, bson.D{{"$set", model}})
-	if err != nil {
-		return nil, err
-	}
 	return &model, nil
 }
-func (s *Service) FindByName(ctx context.Context, name string) (*[]PlanetDocument, error) {
+func (s *Service) FindByName(ctx context.Context, name string) (*[]PlanetOut, error) {
 
 	result, err := s.planets.Find(ctx, bson.M{"name": name})
 	if err != nil { // se o erro nao for nulo
 		return nil, err
 	}
 
-	var models []PlanetDocument
+	var models []PlanetOut
 	err = result.All(ctx, &models)
 	if err != nil {
 		return nil, err
 	}
+	var newListModel []PlanetOut
+	for _, model := range models {
+		var saw swapi.SWAPI
+		var number int
+		number, _ = saw.CountPlanetAppearancesOnMovies(ctx, model.Name)
+		model.NumberOfFilmAppearances = number
+		newListModel = append(newListModel, model)
+	}
 
-	return &models, nil
+	return &newListModel, nil
 }
