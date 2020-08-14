@@ -8,11 +8,10 @@ type PlanetIn struct {
 	Terrain string `json:"terrain"`
 }
 type PlanetDocument struct {
-	ID                      primitive.ObjectID `bson:"_id,omitempty"`
-	Name                    string             `bson:"name"`
-	Climate                 string             `bson:"climate"`
-	Terrain                 string             `bson:"terrain"`
-	NumberOfFilmAppearances int                `bson:"numberOfFilmAppearances"`
+	ID      primitive.ObjectID `bson:"_id,omitempty"`
+	Name    string             `bson:"name"`
+	Climate string             `bson:"climate"`
+	Terrain string             `bson:"terrain"`
 }
 type PlanetOut struct {
 	ID                      primitive.ObjectID `bson:"_id,omitempty"`
@@ -24,10 +23,9 @@ type PlanetOut struct {
 
 func (p *PlanetIn) ToDocument() *PlanetDocument {
 	return &PlanetDocument{
-		Name:                    p.Name,
-		Climate:                 p.Climate,
-		Terrain:                 p.Terrain,
-		NumberOfFilmAppearances: 0,
+		Name:    p.Name,
+		Climate: p.Climate,
+		Terrain: p.Terrain,
 	}
 }
 func (p *PlanetDocument) ToPlanetOut() *PlanetOut {
@@ -36,7 +34,7 @@ func (p *PlanetDocument) ToPlanetOut() *PlanetOut {
 		Name:                    p.Name,
 		Climate:                 p.Climate,
 		Terrain:                 p.Terrain,
-		NumberOfFilmAppearances: p.NumberOfFilmAppearances,
+		NumberOfFilmAppearances: 0,
 	}
 
 }

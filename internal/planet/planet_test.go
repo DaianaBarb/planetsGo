@@ -23,18 +23,17 @@ func TestPlanetDocument_ToPlanetOut(t *testing.T) {
 		{
 			name: "parse planet document to planet out",
 			fields: fields{PlanetDocument: PlanetDocument{
-				ID:                      id,
-				Name:                    "Terra",
-				Climate:                 "frio",
-				Terrain:                 "sei laoq",
-				NumberOfFilmAppearances: 8,
+				ID:      id,
+				Name:    "Terra",
+				Climate: "frio",
+				Terrain: "sei laoq",
 			}},
 			want: &PlanetOut{
 				ID:                      id,
 				Name:                    "Terra",
 				Climate:                 "frio",
 				Terrain:                 "sei laoq",
-				NumberOfFilmAppearances: 8,
+				NumberOfFilmAppearances: 0,
 			}},
 	}
 
@@ -67,11 +66,10 @@ func TestPlanetIn_ToDocument(t *testing.T) {
 				Terrain: "arid",
 			}},
 			want: &PlanetDocument{
-				ID:                      primitive.ObjectID{},
-				Name:                    "Terra",
-				Climate:                 "frio",
-				Terrain:                 "arid",
-				NumberOfFilmAppearances: 0,
+				ID:      primitive.ObjectID{},
+				Name:    "Terra",
+				Climate: "frio",
+				Terrain: "arid",
 			}},
 	}
 	for _, tt := range tests {

@@ -21,10 +21,6 @@ func NewService(db *mongo.Database) *Service {
 
 func (s *Service) Save(ctx context.Context, document *PlanetDocument) error {
 
-	var saw swapi.SWAPI
-	var number int
-	number, err := saw.CountPlanetAppearancesOnMovies(context.Background(), document.Name)
-	document.NumberOfFilmAppearances = number
 	one, err := s.planets.InsertOne(ctx, document)
 	if err != nil {
 		return err
@@ -102,15 +98,18 @@ func (s *Service) FindById(ctx context.Context, id string) (*PlanetOut, error) {
 	}
 	return &model, nil
 }
-func (s *Service) FindByName(ctx context.Context, name string) (*PlanetDocument, error) {
+func (s *Service) FindByName(ctx context.Context, name string) (*[]PlanetDocument, error) {
 
-	result := s.planets.FindOne(ctx, bson.M{"name": name})
+	result, err := s.planets.Find(ctx, bson.M{"name": name})
+	if err != nil { // se o erro nao for nulo
+		return nil, err
+	}
 
-	var model PlanetDocument
-	err := result.Decode(&model)
+	var models []PlanetDocument
+	err = result.All(ctx, &models)
 	if err != nil {
 		return nil, err
 	}
 
-	return &model, nil
+	return &models, nil
 }
