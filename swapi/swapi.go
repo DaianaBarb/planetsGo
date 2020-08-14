@@ -3,7 +3,9 @@ package swapi
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -22,7 +24,9 @@ type SWAPI struct {
 func (s SWAPI) CountPlanetAppearancesOnMovies(ctx context.Context, planetName string) (int, error) {
 	var swapi SWAPI
 	swapi.APIURL = "https://swapi.dev/api/planets/?search="
-
+	url, _ := url.ParseQuery("https://swapi.dev/api/planets")
+	url.Add("search", planetName)
+	fmt.Println(url.Encode())
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, swapi.APIURL+planetName, nil)
 	if err != nil {
 		return 0, err
