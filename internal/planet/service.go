@@ -2,126 +2,98 @@ package planet
 
 import (
 	"context"
-	"projeto-star-wars-api-go/swapi"
-
-	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
+	"projeto-star-wars-api-go/internal/model"
+	"projeto-star-wars-api-go/internal/provider/mongo/dao"
+	"projeto-star-wars-api-go/internal/provider/swapi"
 )
 
-type Service struct {
-	planets *mongo.Collection
+type Service interface {
+	Save(parentContext context.Context, in *model.PlanetIn) (string, error)
+	FindAll(ctx context.Context) ([]model.PlanetOut, error)
+	DeleteById(ctx context.Context, id string) error
+	UpdateById(ctx context.Context, p model.PlanetIn, id string) (*model.PlanetOut, error)
+	FindById(ctx context.Context, id string) (*model.PlanetOut, error)
+	FindByName(ctx context.Context, name string) ([]model.PlanetOut, error)
 }
 
-func NewService(db *mongo.Database) *Service {
-	return &Service{planets: db.Collection("planets")}
+type serviceImpl struct {
+	planets dao.Planets
 }
 
-func (s *Service) Save(ctx context.Context, document *PlanetDocument) error {
+func NewService(planets dao.Planets) Service {
+	return &serviceImpl{planets: planets}
+}
 
-	one, err := s.planets.InsertOne(ctx, document)
+func (s *serviceImpl) Save(ctx context.Context, in *model.PlanetIn) (string, error) {
+	HexID, err := s.planets.Save(ctx, in)
 	if err != nil {
-		return err
+		return "", nil
+	}
+	return HexID, nil
+}
+func (s *serviceImpl) FindAll(ctx context.Context) ([]model.PlanetOut, error) {
+
+	models, err := s.planets.FindAll(ctx)
+	if err != nil {
+		return nil, err
 	}
 
-	document.ID = one.InsertedID.(primitive.ObjectID)
-
-	return nil
-}
-func (s *Service) FindAll(ctx context.Context) ([]PlanetOut, error) {
-
-	result, err := s.planets.Find(ctx, bson.M{})
-	if err != nil { // se o erro nao for nulo
-		return nil, err
-	} // se o erro for igual a a nullo ele n da erro. se o erro for nulo ele da erro
-	var models []PlanetOut // o erro tem que ser nullo para passar aqui e n retornar erro
-	err = result.All(ctx, &models)
-	if err != nil {
-		return nil, err
-	}
-
-	var newListModel []PlanetOut
-	for _, model := range models {
+	var newListModel []model.PlanetOut
+	for _, m := range models {
 		var saw swapi.SWAPI
 		var number int
-		number, _ = saw.CountPlanetAppearancesOnMovies(ctx, model.Name)
-		model.NumberOfFilmAppearances = number
-		newListModel = append(newListModel, model)
+		number, _ = saw.CountPlanetAppearancesOnMovies(ctx, m.Name)
+		m.NumberOfFilmAppearances = number
+		newListModel = append(newListModel, m)
 	}
 
 	return newListModel, nil
 }
 
-func (s *Service) DeleteById(ctx context.Context, id string) error {
-	oID, err := primitive.ObjectIDFromHex(id)
+func (s *serviceImpl) DeleteById(ctx context.Context, id string) error {
+
+	err := s.planets.DeleteById(ctx, id)
 	if err != nil {
 		return err
 	}
-	_, err = s.planets.DeleteOne(ctx, bson.M{"_id": oID})
-	return err
+	return nil
 }
 
-func (s *Service) UpdateById(ctx context.Context, p PlanetIn, id string) (*PlanetDocument, error) {
-	oID, err := primitive.ObjectIDFromHex(id)
+func (s *serviceImpl) UpdateById(ctx context.Context, p model.PlanetIn, id string) (*model.PlanetOut, error) {
+
+	planOut, err := s.planets.UpdateById(ctx, p, id)
 	if err != nil {
 		return nil, err
 	}
-	model := PlanetDocument{
-		ID:      oID,
-		Name:    p.Name,
-		Climate: p.Climate,
-		Terrain: p.Terrain,
-	}
-	opts := options.Update().SetUpsert(true)
-	_, err = s.planets.UpdateOne(ctx, bson.M{"_id": model.ID}, bson.D{{"$set", model}}, opts)
-	if err != nil {
-		return nil, err
-	}
-	return &model, nil
+	return planOut, nil
 
 }
-func (s *Service) FindById(ctx context.Context, id string) (*PlanetOut, error) {
-	//**
-	oID, err := primitive.ObjectIDFromHex(id)
-
-	if err != nil {
-		return nil, err
-	}
-	result := s.planets.FindOne(ctx, bson.M{"_id": oID})
-
-	var model PlanetOut
-	err = result.Decode(&model)
+func (s *serviceImpl) FindById(ctx context.Context, id string) (*model.PlanetOut, error) {
+	planOut, err := s.planets.FindById(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	var saw swapi.SWAPI
 	var number int
-	number, _ = saw.CountPlanetAppearancesOnMovies(ctx, model.Name)
-	model.NumberOfFilmAppearances = number
-	return &model, nil
+	number, _ = saw.CountPlanetAppearancesOnMovies(ctx, planOut.Name)
+	planOut.NumberOfFilmAppearances = number
+	return planOut, nil
 }
-func (s *Service) FindByName(ctx context.Context, name string) (*[]PlanetOut, error) {
+func (s *serviceImpl) FindByName(ctx context.Context, name string) ([]model.PlanetOut, error) {
 
-	result, err := s.planets.Find(ctx, bson.M{"name": name})
-	if err != nil { // se o erro nao for nulo
-		return nil, err
-	}
-
-	var models []PlanetOut
-	err = result.All(ctx, &models)
+	models, err := s.planets.FindByName(ctx, name)
 	if err != nil {
 		return nil, err
 	}
-	var newListModel []PlanetOut
-	for _, model := range models {
+
+	var newListModel []model.PlanetOut
+	for _, m := range models {
 		var saw swapi.SWAPI
 		var number int
-		number, _ = saw.CountPlanetAppearancesOnMovies(ctx, model.Name)
-		model.NumberOfFilmAppearances = number
-		newListModel = append(newListModel, model)
+		number, _ = saw.CountPlanetAppearancesOnMovies(ctx, m.Name)
+		m.NumberOfFilmAppearances = number
+		newListModel = append(newListModel, m)
 	}
 
-	return &newListModel, nil
+	return newListModel, nil
 }

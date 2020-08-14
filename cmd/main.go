@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"projeto-star-wars-api-go/internal/api"
 	"projeto-star-wars-api-go/internal/planet"
+	dao2 "projeto-star-wars-api-go/internal/provider/mongo/dao"
 
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,7 +18,8 @@ func main() {
 
 	fmt.Println("Servidor esta rodando na porta 8080")
 	database := getDatabase()
-	service := planet.NewService(database)
+	dao := dao2.NewMongoPlanet(database)
+	service := planet.NewService(dao)
 	handler := api.NewPlanetHandler(service)
 	router := mux.NewRouter()
 	router.HandleFunc("/planets/{id}", handler.DeleteById).Methods("DELETE")

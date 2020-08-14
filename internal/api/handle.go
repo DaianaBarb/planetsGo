@@ -6,38 +6,39 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"projeto-star-wars-api-go/internal/api/request"
 	"projeto-star-wars-api-go/internal/planet"
 
 	"github.com/gorilla/mux"
 )
 
 type PlanetHandler struct {
-	service *planet.Service
+	service planet.Service
 }
 
-func NewPlanetHandler(service *planet.Service) *PlanetHandler {
+func NewPlanetHandler(service planet.Service) *PlanetHandler {
 	return &PlanetHandler{service: service}
 }
 func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	body, error := ioutil.ReadAll(r.Body)
-	if error != nil {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
-	var in planet.PlanetIn
-	error = json.Unmarshal(body, &in)
-	if error != nil {
+	var in request.PlanetIn
+	err = json.Unmarshal(body, &in)
+	if err != nil {
 		w.WriteHeader(http.StatusUnprocessableEntity)
 	}
 
-	document := in.ToDocument()
-	error = p.service.Save(context.Background(), document)
+	document := in.ToModel()
+	hexId, err := p.service.Save(context.Background(), document)
 
-	if error != nil {
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	url := "http://localhost:8080/planets/" + document.ID.Hex()
+	url := "http://localhost:8080/planets/" + hexId
 	w.Header().Add("location", url)
 	w.WriteHeader(http.StatusCreated)
 
@@ -87,7 +88,7 @@ func (p *PlanetHandler) FindByName(w http.ResponseWriter, r *http.Request) {
 func (p *PlanetHandler) UpdateById(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
-	var newPlanet planet.PlanetIn
+	var newPlanet request.PlanetIn
 	err := json.NewDecoder(r.Body).Decode(&newPlanet)
 
 	if err != nil {
@@ -96,7 +97,9 @@ func (p *PlanetHandler) UpdateById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	planet, err := p.service.UpdateById(context.Background(), newPlanet, vars["id"])
+	planetModel := newPlanet.ToModel()
+
+	planet, err := p.service.UpdateById(context.Background(), *planetModel, vars["id"])
 	if err != nil {
 		log.Println("Error updating the planet", err)
 		w.WriteHeader(http.StatusBadRequest)
