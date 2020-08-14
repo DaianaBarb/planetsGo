@@ -27,7 +27,7 @@ func NewService(planets dao.Planets) Service {
 func (s *serviceImpl) Save(ctx context.Context, in *model.PlanetIn) (string, error) {
 	HexID, err := s.planets.Save(ctx, in)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 	return HexID, nil
 }
