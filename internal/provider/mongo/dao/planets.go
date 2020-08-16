@@ -2,12 +2,14 @@ package dao
 
 import (
 	"context"
+	_ "projeto-star-wars-api-go/internal/api/response"
+	"projeto-star-wars-api-go/internal/model"
+	"projeto-star-wars-api-go/internal/provider/mongo/document"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"projeto-star-wars-api-go/internal/model"
-	"projeto-star-wars-api-go/internal/provider/mongo/document"
 )
 
 type Planets interface {
@@ -54,6 +56,7 @@ func (p planets) FindAll(ctx context.Context) ([]model.PlanetOut, error) {
 	//Transformar para model.Planeout
 	var planetOut []model.PlanetOut
 	for _, planet := range planets {
+		// res := *planet.ToPlanetOut()
 		planetOut = append(planetOut, *planet.ToPlanetOut())
 	}
 

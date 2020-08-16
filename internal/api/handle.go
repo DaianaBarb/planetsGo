@@ -66,6 +66,9 @@ func (p *PlanetHandler) FindById(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 	}
+	//var in *response.PlanetOut
+	//planet2 := in.FromModel(*planet)
+
 	encoder := json.NewEncoder(w)
 	encoder.Encode(planet)
 	w.WriteHeader(http.StatusOK)
@@ -80,6 +83,15 @@ func (p *PlanetHandler) FindByName(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 	}
+
+	//var in *response.PlanetOut
+	//var resp []*response.PlanetOut
+
+	//for _, plan := range planet {
+
+	//	plan2 := in.FromModel(plan)
+	//	resp = append(resp, plan2) }
+
 	encoder := json.NewEncoder(w)
 	encoder.Encode(planet)
 	w.WriteHeader(http.StatusOK)

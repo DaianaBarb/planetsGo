@@ -1,8 +1,9 @@
 package response
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"projeto-star-wars-api-go/internal/model"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type PlanetOut struct {
@@ -13,7 +14,7 @@ type PlanetOut struct {
 	NumberOfFilmAppearances int                `json:"numberOfFilmAppearances"`
 }
 
-func (p *PlanetOut) FromModel(out *model.PlanetOut) *PlanetOut {
+func (p *PlanetOut) FromModel(out model.PlanetOut) *PlanetOut {
 	p.ID = out.ID
 	p.Name = out.Name
 	p.Climate = out.Climate
