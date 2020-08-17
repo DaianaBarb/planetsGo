@@ -28,6 +28,7 @@ func main() {
 	router.HandleFunc("/planets", handler.GetAll).Methods("GET")
 	router.HandleFunc("/planets/{id}", handler.FindById).Methods("GET")
 	router.HandleFunc("/planets/", handler.FindByName).Methods("GET").Queries("name", "")
+	router.HandleFunc("planets/healthcheck", handler.Healthcheck).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", router))
 
 }

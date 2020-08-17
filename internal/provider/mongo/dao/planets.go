@@ -111,6 +111,7 @@ func (p planets) FindById(ctx context.Context, id string) (*model.PlanetOut, err
 }
 
 func (p planets) FindByName(ctx context.Context, name string) ([]model.PlanetOut, error) {
+	var planetOut []model.PlanetOut
 	result, err := p.planets.Find(ctx, bson.M{"name": name})
 	if err != nil { // se o erro nao for nulo
 		return nil, err
@@ -123,9 +124,12 @@ func (p planets) FindByName(ctx context.Context, name string) ([]model.PlanetOut
 	}
 
 	//Transformar para model.Planeout
-	var planetOut []model.PlanetOut
+
 	for _, planet := range models {
 		planetOut = append(planetOut, *planet.ToPlanetOut())
+	}
+	if len(planetOut) == 0 {
+		return planetOut, nil
 	}
 
 	return planetOut, nil

@@ -9,6 +9,9 @@ import (
 	"projeto-star-wars-api-go/internal/api/request"
 	"projeto-star-wars-api-go/internal/planet"
 
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+
 	"github.com/gorilla/mux"
 )
 
@@ -65,7 +68,9 @@ func (p *PlanetHandler) FindById(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
+		return
 	}
+
 	//var in *response.PlanetOut
 	//planet2 := in.FromModel(*planet)
 
@@ -81,9 +86,14 @@ func (p *PlanetHandler) FindByName(w http.ResponseWriter, r *http.Request) {
 	planet, err := p.service.FindByName(context.Background(), planetName)
 
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
+	if len(planet) == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 	//var in *response.PlanetOut
 	//var resp []*response.PlanetOut
 
@@ -142,4 +152,17 @@ func (p *PlanetHandler) DeleteById(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 	}
 	w.WriteHeader(http.StatusOK)
+}
+func (p *PlanetHandler) Healthcheck(w http.ResponseWriter, r *http.Request) {
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
+
+	client, err := mongo.Connect(context.Background(), clientOptions)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if client != nil {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 }
