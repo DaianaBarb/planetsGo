@@ -5,6 +5,8 @@ import (
 	"projeto-star-wars-api-go/internal/model"
 	"projeto-star-wars-api-go/internal/provider/mongo/dao"
 	"projeto-star-wars-api-go/internal/provider/swapi"
+
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Service interface {
@@ -14,6 +16,7 @@ type Service interface {
 	UpdateById(ctx context.Context, p model.PlanetIn, id string) (*model.PlanetOut, error)
 	FindById(ctx context.Context, id string) (*model.PlanetOut, error)
 	FindByName(ctx context.Context, name string) ([]model.PlanetOut, error)
+	Healthcheck() (*mongo.Database, error)
 }
 
 type serviceImpl struct {
@@ -96,4 +99,15 @@ func (s *serviceImpl) FindByName(ctx context.Context, name string) ([]model.Plan
 	}
 
 	return newListModel, nil
+}
+
+func (s *serviceImpl) Healthcheck() (*mongo.Database, error) {
+
+	cliente, err := s.planets.GetDatabase()
+	if err != nil {
+		return nil, err
+	}
+
+	return cliente, nil
+
 }

@@ -1,8 +1,9 @@
 package document
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"projeto-star-wars-api-go/internal/model"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type PlanetDocument struct {

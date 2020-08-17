@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,14 +9,12 @@ import (
 	dao2 "projeto-star-wars-api-go/internal/provider/mongo/dao"
 
 	"github.com/gorilla/mux"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
 
 	fmt.Println("Servidor esta rodando na porta 8080")
-	database := getDatabase()
+	database, _ := dao2.GetDatabase()
 	dao := dao2.NewMongoPlanet(database)
 	service := planet.NewService(dao)
 	handler := api.NewPlanetHandler(service)
@@ -30,17 +27,5 @@ func main() {
 	router.HandleFunc("/planets/", handler.FindByName).Methods("GET").Queries("name", "")
 	router.HandleFunc("planets/healthcheck", handler.Healthcheck).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", router))
-
-}
-
-func getDatabase() *mongo.Database {
-	// usar essa linha a baixo quando for utilizar o docker file e apagar a linha posterior
-	//clientOptions := options.Client().ApplyURI("mongodb://mongo-star")
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
-	client, err := mongo.Connect(context.Background(), clientOptions)
-	if err != nil {
-		//tratar
-	}
-	return client.Database("star-wars")
 
 }

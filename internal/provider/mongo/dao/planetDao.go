@@ -19,14 +19,35 @@ type Planets interface {
 	UpdateById(ctx context.Context, p model.PlanetIn, id string) (*model.PlanetOut, error)
 	FindById(ctx context.Context, id string) (*model.PlanetOut, error)
 	FindByName(ctx context.Context, name string) ([]model.PlanetOut, error)
+	GetDatabase() (*mongo.Database, error)
 }
 
 type planets struct {
 	planets *mongo.Collection
 }
 
+func (p planets) GetDatabase() (*mongo.Database, error) {
+	return p.GetDatabase()
+}
+
 func NewMongoPlanet(db *mongo.Database) Planets {
 	return &planets{planets: db.Collection("planets")}
+}
+
+func GetDatabase() (*mongo.Database, error) {
+	// usar essa linha a baixo quando for utilizar o docker file e apagar a linha posterior
+	//clientOptions := options.Client().ApplyURI("mongodb://mongo-star")
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
+	client, err := mongo.Connect(context.Background(), clientOptions)
+	if err != nil {
+		return nil, err
+	}
+	errr := client.Ping(context.Background(), nil)
+	if errr != nil {
+		return nil, errr
+	}
+	return client.Database("star-wars"), nil
+
 }
 
 func (p planets) Save(parentContext context.Context, planet *model.PlanetIn) (string, error) {

@@ -9,9 +9,6 @@ import (
 	"projeto-star-wars-api-go/internal/api/request"
 	"projeto-star-wars-api-go/internal/planet"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-
 	"github.com/gorilla/mux"
 )
 
@@ -154,15 +151,15 @@ func (p *PlanetHandler) DeleteById(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 func (p *PlanetHandler) Healthcheck(w http.ResponseWriter, r *http.Request) {
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
 
-	client, err := mongo.Connect(context.Background(), clientOptions)
+	_, err := p.service.Healthcheck()
+
 	if err != nil {
+
 		w.WriteHeader(http.StatusInternalServerError)
 		return
+
 	}
-	if client != nil {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
+	w.WriteHeader(http.StatusOK)
+	return
 }

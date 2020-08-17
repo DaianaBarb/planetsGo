@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"projeto-star-wars-api-go/internal/model"
-	"projeto-star-wars-api-go/internal/provider/mongo/dao"
 	"projeto-star-wars-api-go/internal/provider/mongo/dao/mocks"
 	"reflect"
 	"testing"
@@ -96,8 +95,9 @@ func Test_serviceImpl_Save(t *testing.T) {
 }
 func Test_serviceImpl_FindById(t *testing.T) {
 	idd := primitive.NewObjectID()
+
 	type fields struct {
-		planets dao.Planets
+		planets *mocks.Planets //Faltou mudar o tipo de dao.Planets para *mocks.Planets. Temos que mudar para passar o mock e e podermos definir o retorno necessário
 	}
 	type args struct {
 		ctx context.Context
@@ -142,6 +142,9 @@ func Test_serviceImpl_FindById(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
+			tt.mock(tt.fields.planets) //Faltou adicionar essa chamada do método para popular a variável repository no field 	mock: func(repository *mocks.Planets)
+
 			s := &serviceImpl{
 				planets: tt.fields.planets,
 			}
@@ -153,6 +156,8 @@ func Test_serviceImpl_FindById(t *testing.T) {
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("FindById() got = %v, want %v", got, tt.want)
 			}
+
+			tt.fields.planets.AssertExpectations(t) // Faltou adicionar esse assert para do mock para compararmos se a resposta está de acordo com o que queremos
 		})
 	}
 }
