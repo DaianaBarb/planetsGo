@@ -29,3 +29,12 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", router))
 
 }
+
+//func getDatabase() *mongo.Database {
+//clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
+//	client, err := mongo.Connect(context.Background(), clientOptions)
+//	if err != nil {
+//tratar
+//}
+//return client.Database("star-wars")
+//}
