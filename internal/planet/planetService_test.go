@@ -207,3 +207,74 @@ func Test_serviceImpl_DeleteById(t *testing.T) {
 		})
 	}
 }
+
+func Test_serviceImpl_UpdateById(t *testing.T) {
+	id:= primitive.NewObjectID().Hex()
+	idd,_:= primitive.ObjectIDFromHex(id)
+	type fields struct {
+		planets *mocks.Planets
+	}
+	type args struct {
+		ctx context.Context
+		p   model.PlanetIn
+		id  string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *model.PlanetOut
+		wantErr bool
+		mock    func(repository *mocks.Planets)
+	}{
+		{
+			name: "success",
+			fields: fields{
+				planets: new(mocks.Planets), //&mocks.Planets{}
+			},
+			args: args{
+				ctx: context.Background(),
+				p: model.PlanetIn{
+					Name: mock.Anything,
+	                Climate : mock.Anything,
+	                Terrain :mock.Anything,
+				},
+				id:  id,
+			},
+			want:    &model.PlanetOut{
+				ID                  :       idd,
+	            Name                :    mock.Anything,
+	            Climate             :    mock.Anything,
+	            Terrain             :    mock.Anything,
+	            NumberOfFilmAppearances :0,
+			},
+			wantErr: false,
+			mock: func(repository *mocks.Planets) {
+				repository.On("UpdateById", mock.Anything, mock.Anything,mock.Anything).Return(&model.PlanetOut{
+				ID                  :       idd,
+	            Name                :    mock.Anything,
+	            Climate             :    mock.Anything,
+	            Terrain             :    mock.Anything,
+	            NumberOfFilmAppearances :0,
+			},nil).Once()
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mock(tt.fields.planets)
+			s := &serviceImpl{
+				planets: tt.fields.planets,
+			}
+			got, err := s.UpdateById(tt.args.ctx, tt.args.p, tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UpdateById() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("UpdateById() got = %v, want %v", got, tt.want)
+			}
+			tt.fields.planets.AssertExpectations(t)
+		})
+	}
+}
