@@ -87,7 +87,7 @@ func (p *PlanetHandler) FindByName(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(planet) == 0 {
+	if len(*planet) == 0 {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
