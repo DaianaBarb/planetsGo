@@ -161,3 +161,49 @@ func Test_serviceImpl_FindById(t *testing.T) {
 		})
 	}
 }
+
+func Test_serviceImpl_DeleteById(t *testing.T) {
+	type fields struct {
+		planets *mocks.Planets
+	}
+	type args struct {
+		ctx context.Context
+		id  string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    error
+		wantErr bool
+		mock    func(repository *mocks.Planets)
+	}{
+		{
+			name: "success",
+			fields: fields{
+				planets: new(mocks.Planets), //&mocks.Planets{}
+			},
+			args: args{
+				ctx: context.Background(),
+				id:  mock.Anything,
+			},
+			want:    nil,
+			wantErr: false,
+			mock: func(repository *mocks.Planets) {
+				repository.On("DeleteById", mock.Anything, mock.Anything).Return(nil).Once()
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mock(tt.fields.planets)
+			s := &serviceImpl{
+				planets: tt.fields.planets,
+			}
+			if err := s.DeleteById(tt.args.ctx, tt.args.id); (err != nil) != tt.wantErr {
+				t.Errorf("DeleteById() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			tt.fields.planets.AssertExpectations(t)
+		})
+	}
+}
