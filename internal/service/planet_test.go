@@ -179,3 +179,66 @@ func Test_planet_FindById(t *testing.T) {
 		})
 	}
 }
+
+func Test_planet_UpdateById(t *testing.T) {
+	id := primitive.NewObjectID().Hex()
+	idd, _ := primitive.ObjectIDFromHex(id)
+
+	type fields struct {
+		dao   *mocks.Planet
+		swapi SWAPI
+	}
+	type args struct {
+		ctx context.Context
+		p   model.PlanetIn
+		id  string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *model.PlanetOut
+		wantErr bool
+		mock    func(repository *mocks.Planet)
+	}{
+		{name: "success",
+			fields: fields{
+				dao:   new(mocks.Planet),
+				swapi: NewSWAPI(),
+			},
+			args: args{
+				ctx: context.Background(),
+				p: model.PlanetIn{
+					Name:    mock.Anything,
+					Climate: mock.Anything,
+					Terrain: mock.Anything,
+				},
+				id: id,
+			},
+			want: &model.PlanetOut{
+				ID:                      idd,
+				Name:                    mock.Anything,
+				Climate:                 mock.Anything,
+				Terrain:                 mock.Anything,
+				NumberOfFilmAppearances: 0,
+			},
+			wantErr: false,
+			mock: func(repository *mocks.Planet) {
+				repository.On("UpdateById", mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mock(tt.fields.dao)
+			s := &planet{
+				dao:   tt.fields.dao,
+				swapi: tt.fields.swapi,
+			}
+			if err := s.UpdateById(tt.args.ctx, tt.args.p, tt.args.id); (err != nil) != tt.wantErr {
+				t.Errorf("UpdateById() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			tt.fields.dao.AssertExpectations(t)
+		})
+	}
+}
