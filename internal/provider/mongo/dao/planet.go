@@ -24,10 +24,6 @@ type planet struct {
 	collection *mongo.Collection
 }
 
-func (p *planet) GetDatabase() (*mongo.Database, error) {
-	return p.GetDatabase()
-}
-
 func NewMongoPlanet(db *mongo.Database) Planet {
 	return &planet{collection: db.Collection("planet")}
 }
@@ -62,13 +58,9 @@ func (p *planet) FindAll(ctx context.Context) ([]model.Planet, error) {
 	}
 
 	var planets []model.Planet
-	for _, planet := range documents {
-		planets = append(planets, model.Planet{
-			ID:      planet.ID,
-			Name:    planet.Name,
-			Climate: planet.Climate,
-			Terrain: planet.Terrain,
-		})
+	for _, doc := range documents {
+		planet := ToPlanet(doc)
+		planets = append(planets, *planet)
 	}
 	return planets, err
 }
@@ -121,12 +113,7 @@ func (p *planet) FindById(ctx context.Context, id string) (*model.Planet, error)
 		return nil, err
 	}
 
-	return &model.Planet{
-		ID:      doc.ID,
-		Name:    doc.Name,
-		Climate: doc.Climate,
-		Terrain: doc.Terrain,
-	}, nil
+	return ToPlanet(doc), nil
 }
 
 func (p *planet) FindByName(ctx context.Context, name string) ([]model.Planet, error) {
@@ -144,15 +131,19 @@ func (p *planet) FindByName(ctx context.Context, name string) ([]model.Planet, e
 	var planets []model.Planet
 
 	for _, doc := range documents {
-		planet := model.Planet{
-			ID:      doc.ID,
-			Name:    doc.Name,
-			Climate: doc.Climate,
-			Terrain: doc.Terrain,
-		}
+		planet := ToPlanet(doc)
 
-		planets = append(planets, planet)
+		planets = append(planets, *planet)
 	}
 
 	return planets, nil
+}
+func ToPlanet(p document.Planet) *model.Planet {
+
+	return &model.Planet{
+		ID:      p.ID,
+		Name:    p.Name,
+		Climate: p.Climate,
+		Terrain: p.Terrain,
+	}
 }
