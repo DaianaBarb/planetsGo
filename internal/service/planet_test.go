@@ -242,3 +242,86 @@ func Test_planet_UpdateById(t *testing.T) {
 		})
 	}
 }
+
+func Test_planet_FindAll(t *testing.T) {
+	id := primitive.NewObjectID()
+	type fields struct {
+		dao   *mocks.Planet
+		swapi SWAPI
+	}
+	type args struct {
+		ctx context.Context
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *[]model.PlanetOut
+		wantErr bool
+		mock    func(repository *mocks.Planet)
+	}{
+		{
+			name: "findALl success",
+			fields: fields{
+				dao:   new(mocks.Planet),
+				swapi: NewSWAPI(),
+			},
+			args: args{
+				ctx: context.Background(),
+			},
+			want: &[]model.PlanetOut{
+
+				model.PlanetOut{
+					ID:                      id,
+					Name:                    mock.Anything,
+					Climate:                 mock.Anything,
+					Terrain:                 mock.Anything,
+					NumberOfFilmAppearances: 0,
+				},
+				model.PlanetOut{
+					ID:                      id,
+					Name:                    mock.Anything,
+					Climate:                 mock.Anything,
+					Terrain:                 mock.Anything,
+					NumberOfFilmAppearances: 0,
+				},
+			},
+			wantErr: false,
+			mock: func(repository *mocks.Planet) {
+				repository.On("FindAll", mock.Anything).Return([]model.Planet{
+					model.Planet{
+
+						ID:      id,
+						Name:    mock.Anything,
+						Climate: mock.Anything,
+						Terrain: mock.Anything,
+					},
+					model.Planet{
+						ID:      id,
+						Name:    mock.Anything,
+						Climate: mock.Anything,
+						Terrain: mock.Anything,
+					},
+				}, nil).Once()
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mock(tt.fields.dao)
+			s := &planet{
+				dao:   tt.fields.dao,
+				swapi: tt.fields.swapi,
+			}
+			got, err := s.FindAll(tt.args.ctx)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FindAll() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("FindAll() got = %v, want %v", got, tt.want)
+			}
+			tt.fields.dao.AssertExpectations(t)
+		})
+	}
+}
