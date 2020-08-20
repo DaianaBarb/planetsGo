@@ -1,4 +1,4 @@
-package api
+package router
 
 import (
 	"context"
@@ -6,17 +6,17 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"projeto-star-wars-api-go/internal/api/request"
-	"projeto-star-wars-api-go/internal/planet"
+	"projeto-star-wars-api-go/internal/model"
+	"projeto-star-wars-api-go/internal/service"
 
 	"github.com/gorilla/mux"
 )
 
 type PlanetHandler struct {
-	service planet.Service
+	service service.Planet
 }
 
-func NewPlanetHandler(service planet.Service) *PlanetHandler {
+func NewPlanetHandler(service service.Planet) *PlanetHandler {
 	return &PlanetHandler{service: service}
 }
 func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
@@ -25,14 +25,13 @@ func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
-	var in request.PlanetIn
+	var in model.PlanetIn
 	err = json.Unmarshal(body, &in)
 	if err != nil {
 		w.WriteHeader(http.StatusUnprocessableEntity)
 	}
 
-	document := in.ToModel()
-	hexId, err := p.service.Save(context.Background(), document)
+	hexId, err := p.service.Save(context.Background(), &in)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -64,51 +63,44 @@ func (p *PlanetHandler) FindById(w http.ResponseWriter, r *http.Request) {
 	planet, err := p.service.FindById(context.Background(), vars["id"])
 
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	//var in *response.PlanetOut
-	//planet2 := in.FromModel(*planet)
+	if planet == nil {
+		w.WriteHeader(http.StatusNotFound)
+	}
 
 	encoder := json.NewEncoder(w)
 	encoder.Encode(planet)
 	w.WriteHeader(http.StatusOK)
-
 }
 
 func (p *PlanetHandler) FindByName(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	planetName := r.URL.Query().Get("name")
-	planet, err := p.service.FindByName(context.Background(), planetName)
+	planets, err := p.service.FindByName(context.Background(), planetName)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if len(*planet) == 0 {
+	if len(planets) == 0 {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	//var in *response.PlanetOut
-	//var resp []*response.PlanetOut
-
-	//for _, plan := range planet {
-
-	//	plan2 := in.FromModel(plan)
-	//	resp = append(resp, plan2) }
 
 	encoder := json.NewEncoder(w)
-	encoder.Encode(planet)
+	encoder.Encode(planets)
 	w.WriteHeader(http.StatusOK)
 
 }
 func (p *PlanetHandler) UpdateById(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
-	var newPlanet request.PlanetIn
-	err := json.NewDecoder(r.Body).Decode(&newPlanet)
+	var planetIn model.PlanetIn
+	err := json.NewDecoder(r.Body).Decode(&planetIn)
 
 	if err != nil {
 		log.Println("Error Decoding the planet", err)
@@ -116,29 +108,14 @@ func (p *PlanetHandler) UpdateById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	planetModel := newPlanet.ToModel()
-
-	planet, err := p.service.UpdateById(context.Background(), *planetModel, vars["id"])
+	err = p.service.UpdateById(context.Background(), planetIn, vars["id"])
 	if err != nil {
 		log.Println("Error updating the planet", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	response, err := json.Marshal(planet)
 
-	if err != nil {
-		log.Println("Error Marshaling the result planet", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write(response)
-	if err != nil {
-		log.Println("Error to write the response", err)
-	}
-
 }
 
 func (p *PlanetHandler) DeleteById(w http.ResponseWriter, r *http.Request) {
@@ -149,17 +126,4 @@ func (p *PlanetHandler) DeleteById(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 	}
 	w.WriteHeader(http.StatusOK)
-}
-func (p *PlanetHandler) Healthcheck(w http.ResponseWriter, r *http.Request) {
-
-	_, err := p.service.Healthcheck()
-
-	if err != nil {
-
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-
-	}
-	w.WriteHeader(http.StatusOK)
-	return
 }

@@ -1,9 +1,8 @@
-package swapi
+package service
 
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -21,13 +20,19 @@ type SWAPI struct {
 	APIURL string
 }
 
+func NewSWAPI() SWAPI {
+	return SWAPI{APIURL: "https://swapi.dev/api/planets"}
+}
+
 func (s SWAPI) CountPlanetAppearancesOnMovies(ctx context.Context, planetName string) (int, error) {
-	var swapi SWAPI
-	swapi.APIURL = "https://swapi.dev/api/planets/?search="
-	url, _ := url.ParseQuery("https://swapi.dev/api/planets")
-	url.Add("search", planetName)
-	fmt.Println(url.Encode())
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, swapi.APIURL+planetName, nil)
+
+	u, _ := url.Parse(s.APIURL)
+	q, _ := url.ParseQuery(u.RawQuery)
+	q.Add("search", planetName)
+
+	u.RawQuery = q.Encode()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
 		return 0, err
 	}
