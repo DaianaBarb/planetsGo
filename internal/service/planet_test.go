@@ -66,3 +66,48 @@ func Test_planet_Save(t *testing.T) {
 		})
 	}
 }
+
+func Test_planet_DeleteById(t *testing.T) {
+	type fields struct {
+		dao   *mocks.Planet
+		swapi SWAPI
+	}
+	type args struct {
+		ctx context.Context
+		id  string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    error
+		wantErr bool
+		mock    func(repository *mocks.Planet)
+	}{
+		{
+			name: "delete sucess",
+			fields: fields{
+				dao:   new(mocks.Planet),
+				swapi: NewSWAPI(),
+			},
+			want:    nil,
+			wantErr: false,
+			mock: func(repository *mocks.Planet) {
+				repository.On("DeleteById", mock.Anything, mock.Anything).Return(nil).Once()
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mock(tt.fields.dao)
+			s := &planet{
+				dao:   tt.fields.dao,
+				swapi: tt.fields.swapi,
+			}
+			if err := s.DeleteById(tt.args.ctx, tt.args.id); (err != nil) != tt.wantErr {
+				t.Errorf("DeleteById() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			tt.fields.dao.AssertExpectations(t)
+		})
+	}
+}
