@@ -57,7 +57,7 @@ func TestPlanetHandler_SavePlanet(t *testing.T) {
 			wantErr: false,
 			mock: func(fs *mocks.Planet) {
 				fs.On("Save", mock.Anything, mock.Anything).
-					Return(http.StatusCreated).Once()
+					Return(mock.Anything, nil).Once()
 			},
 		},
 	}
