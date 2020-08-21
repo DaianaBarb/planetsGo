@@ -29,6 +29,7 @@ func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, &in)
 	if err != nil {
 		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
 	}
 
 	hexId, err := p.service.Save(context.Background(), &in)
