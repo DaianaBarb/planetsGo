@@ -70,6 +70,26 @@ func Test_planet_Save(t *testing.T) {
 				repository.On("Save", mock.Anything, mock.Anything).Return("", errors.New("error to save"))
 			},
 		},
+		{
+			name: "save error2",
+			fields: fields{
+				dao:   new(mocks.Planet),
+				swapi: NewSWAPI(),
+			},
+			args: args{
+				ctx: context.Background(),
+				in: &model.PlanetIn{
+					Name:    mock.Anything,
+					Climate: mock.Anything,
+					Terrain: mock.Anything,
+				},
+			},
+			want:    "",
+			wantErr: true,
+			mock: func(repository *mocks.Planet) {
+				repository.On("Save", mock.Anything, mock.Anything).Return("", errors.New("error to save"))
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
