@@ -219,7 +219,7 @@ func Test_planet_FindById(t *testing.T) {
 
 func Test_planet_UpdateById(t *testing.T) {
 	id := primitive.NewObjectID().Hex()
-	idd, _ := primitive.ObjectIDFromHex(id)
+	//idd, _ := primitive.ObjectIDFromHex(id)
 
 	type fields struct {
 		dao   *mocks.Planet
@@ -234,7 +234,7 @@ func Test_planet_UpdateById(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *model.PlanetOut
+		want    error
 		wantErr bool
 		mock    func(repository *mocks.Planet)
 	}{
@@ -252,16 +252,31 @@ func Test_planet_UpdateById(t *testing.T) {
 				},
 				id: id,
 			},
-			want: &model.PlanetOut{
-				ID:                      idd,
-				Name:                    mock.Anything,
-				Climate:                 mock.Anything,
-				Terrain:                 mock.Anything,
-				NumberOfFilmAppearances: 0,
-			},
+			want:    nil,
 			wantErr: false,
 			mock: func(repository *mocks.Planet) {
 				repository.On("UpdateById", mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+			},
+		},
+		{
+			name: "error",
+			fields: fields{
+				dao:   new(mocks.Planet),
+				swapi: NewSWAPI(),
+			},
+			args: args{
+				ctx: context.Background(),
+				p: model.PlanetIn{
+					Name:    mock.Anything,
+					Climate: mock.Anything,
+					Terrain: mock.Anything,
+				},
+				id: id,
+			},
+			want:    errors.New("erro ao fazer update"),
+			wantErr: true,
+			mock: func(repository *mocks.Planet) {
+				repository.On("UpdateById", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("erro ao fazer update"))
 			},
 		},
 	}
