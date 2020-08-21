@@ -357,6 +357,19 @@ func Test_planet_FindAll(t *testing.T) {
 				}, nil).Once()
 			},
 		},
+		{name: "findALl error",
+			fields: fields{
+				dao:   new(mocks.Planet),
+				swapi: NewSWAPI(),
+			},
+			args: args{
+				ctx: context.Background(),
+			},
+			want:    nil,
+			wantErr: true,
+			mock: func(repository *mocks.Planet) {
+				repository.On("FindAll", mock.Anything).Return(nil, errors.New("erro ao retornar"))
+			}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
