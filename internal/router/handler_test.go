@@ -10,7 +10,7 @@ import (
 )
 
 func TestPlanetHandler_SavePlanet(t *testing.T) {
-	var rr *http.Request
+	//var rr *http.Request
 
 	//planetJSON, _ := json.Marshal(planetToCreate)
 	//r = planetJSON
