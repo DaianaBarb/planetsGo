@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"projeto-star-wars-api-go/internal/model"
 	"projeto-star-wars-api-go/internal/provider/mongo/dao/mocks"
 	"reflect"
@@ -47,6 +48,26 @@ func Test_planet_Save(t *testing.T) {
 			wantErr: false,
 			mock: func(repository *mocks.Planet) {
 				repository.On("Save", mock.Anything, mock.Anything).Return(mock.Anything, nil).Once()
+			},
+		},
+		{
+			name: "save error",
+			fields: fields{
+				dao:   new(mocks.Planet),
+				swapi: NewSWAPI(),
+			},
+			args: args{
+				ctx: context.Background(),
+				in: &model.PlanetIn{
+					Name:    mock.Anything,
+					Climate: mock.Anything,
+					Terrain: mock.Anything,
+				},
+			},
+			want:    "",
+			wantErr: true,
+			mock: func(repository *mocks.Planet) {
+				repository.On("Save", mock.Anything, mock.Anything).Return("", errors.New("error to save"))
 			},
 		},
 	}
@@ -256,7 +277,7 @@ func Test_planet_FindAll(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *[]model.PlanetOut
+		want    []model.PlanetOut
 		wantErr bool
 		mock    func(repository *mocks.Planet)
 	}{
@@ -269,7 +290,7 @@ func Test_planet_FindAll(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 			},
-			want: &[]model.PlanetOut{
+			want: []model.PlanetOut{
 
 				model.PlanetOut{
 					ID:                      id,
