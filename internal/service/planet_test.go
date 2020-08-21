@@ -180,6 +180,22 @@ func Test_planet_FindById(t *testing.T) {
 				}, nil).Once()
 			},
 		},
+		{
+			name: "error",
+			fields: fields{
+				dao:   new(mocks.Planet),
+				swapi: NewSWAPI(),
+			},
+			args: args{
+				ctx: context.Background(),
+				id:  mock.Anything,
+			},
+			want:    nil,
+			wantErr: true,
+			mock: func(repository *mocks.Planet) {
+				repository.On("FindById", mock.Anything, mock.Anything).Return(nil, errors.New("error ao buscar"))
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
