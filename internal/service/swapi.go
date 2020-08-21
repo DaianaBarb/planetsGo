@@ -48,9 +48,8 @@ func (s SWAPI) CountPlanetAppearancesOnMovies(ctx context.Context, planetName st
 		return 0, err
 	}
 
-	if len(searchResponse.Results) == 0 {
-		return 0, nil
-	}
+	//if len(searchResponse.Results) == 0 {
+	//return 0, nil }
 
 	for _, p := range searchResponse.Results {
 		if strings.EqualFold(p.Name, planetName) {
