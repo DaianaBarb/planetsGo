@@ -1,6 +1,7 @@
 package router
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -84,7 +85,7 @@ func TestPlanetHandler_DeleteById(t *testing.T) {
 		service *mocks.Planet
 	}
 	type args struct {
-		id string
+		id io.Reader
 	}
 	tests := []struct {
 		name               string
@@ -100,14 +101,15 @@ func TestPlanetHandler_DeleteById(t *testing.T) {
 			},
 			args: args{
 
-				id: id.Hex(),
+				id: strings.NewReader(id.Hex()),
 			},
 			wantHttpStatusCode: http.StatusOK,
 			mock: func(fs *mocks.Planet) {
-				fs.On("DeleteById", mock.Anything, mock.Anything).Return(mock.Anything, nil).Once()
+				fs.On("DeleteById", mock.Anything, mock.Anything).Return(nil).Once()
 			}},
 	}
 	for _, tt := range tests {
+		tt.mock(tt.fields.service)
 		t.Run(tt.name, func(t *testing.T) {
 			p := &PlanetHandler{
 				service: tt.fields.service,
@@ -116,6 +118,45 @@ func TestPlanetHandler_DeleteById(t *testing.T) {
 			recorder := httptest.NewRecorder()
 
 			p.DeleteById(recorder, request)
+
+			assert.Equal(t, tt.wantHttpStatusCode, recorder.Code)
+
+			tt.fields.service.AssertExpectations(t)
+		})
+	}
+}
+
+func TestPlanetHandler_GetAll(t *testing.T) {
+	type fields struct {
+		service *mocks.Planet
+	}
+
+	tests := []struct {
+		name               string
+		fields             fields
+		wantHttpStatusCode int
+		mock               func(fs *mocks.Planet)
+	}{
+		{
+			name: "sucesss",
+			fields: fields{
+				service: new(mocks.Planet),
+			},
+			wantHttpStatusCode: http.StatusOK,
+			mock: func(fs *mocks.Planet) {
+				fs.On("FindAll", context.Background()).Return(mock.Anything, nil).Once()
+			}},
+	}
+	for _, tt := range tests {
+		tt.mock(tt.fields.service)
+		t.Run(tt.name, func(t *testing.T) {
+			p := &PlanetHandler{
+				service: tt.fields.service,
+			}
+			request := httptest.NewRequest(http.MethodGet, "/planets", nil)
+			recorder := httptest.NewRecorder()
+
+			p.FindAll(recorder, request)
 
 			assert.Equal(t, tt.wantHttpStatusCode, recorder.Code)
 

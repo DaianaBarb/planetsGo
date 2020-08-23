@@ -43,7 +43,7 @@ func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 
 }
-func (p *PlanetHandler) GetAll(w http.ResponseWriter, r *http.Request) {
+func (p *PlanetHandler) FindAll(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	//ctx, _ := context.WithTimeout(context.Background(), 20*time.Second)
 	planets, err := p.service.FindAll(context.Background())
