@@ -1,10 +1,10 @@
 package router
 
 import (
-	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"projeto-star-wars-api-go/internal/model"
 	"projeto-star-wars-api-go/internal/service/mocks"
 	"strings"
 	"testing"
@@ -127,6 +127,7 @@ func TestPlanetHandler_DeleteById(t *testing.T) {
 }
 
 func TestPlanetHandler_GetAll(t *testing.T) {
+	var planets []model.PlanetOut
 	type fields struct {
 		service *mocks.Planet
 	}
@@ -144,7 +145,7 @@ func TestPlanetHandler_GetAll(t *testing.T) {
 			},
 			wantHttpStatusCode: http.StatusOK,
 			mock: func(fs *mocks.Planet) {
-				fs.On("FindAll", context.Background()).Return(mock.Anything, nil).Once()
+				fs.On("FindAll", mock.Anything, mock.Anything).Return(planets, nil).Once()
 			}},
 	}
 	for _, tt := range tests {
