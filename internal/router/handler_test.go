@@ -212,3 +212,51 @@ func TestPlanetHandler_Update(t *testing.T) {
 		})
 	}
 }
+
+func TestPlanetHandler_FindById(t *testing.T) {
+	id := primitive.NewObjectID()
+	planet := &model.PlanetOut{ID: id, Name: "", Terrain: "", Climate: ""}
+
+	type fields struct {
+		service *mocks.Planet
+	}
+	type args struct {
+		id string
+	}
+	tests := []struct {
+		name               string
+		fields             fields
+		args               args
+		wantHttpStatusCode int
+		mock               func(fs *mocks.Planet)
+	}{
+		{
+			name: "sucesss",
+			fields: fields{
+				service: new(mocks.Planet),
+			},
+			args: args{
+				id: (id.Hex()),
+			},
+			wantHttpStatusCode: http.StatusOK,
+			mock: func(fs *mocks.Planet) {
+				fs.On("FindById", mock.Anything, mock.Anything).Return(planet, nil).Once()
+			}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mock(tt.fields.service)
+			p := &PlanetHandler{
+				service: tt.fields.service,
+			}
+			request := httptest.NewRequest(http.MethodGet, "/planets/"+id.Hex(), nil)
+			recorder := httptest.NewRecorder()
+
+			p.FindById(recorder, request)
+
+			assert.Equal(t, tt.wantHttpStatusCode, recorder.Code)
+
+			tt.fields.service.AssertExpectations(t)
+		})
+	}
+}
