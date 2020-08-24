@@ -15,7 +15,7 @@ type Planet interface {
 	Save(parentContext context.Context, planet *model.Planet) (string, error)
 	FindAll(ctx context.Context) ([]model.Planet, error)
 	DeleteById(ctx context.Context, id string) error
-	UpdateById(ctx context.Context, p *model.Planet, id string) error
+	Update(ctx context.Context, p *model.Planet, id string) error
 	FindById(ctx context.Context, id string) (*model.Planet, error)
 	FindByName(ctx context.Context, name string) ([]model.Planet, error)
 }
@@ -79,7 +79,7 @@ func (p *planet) DeleteById(ctx context.Context, id string) error {
 	return nil
 }
 
-func (p *planet) UpdateById(ctx context.Context, planet *model.Planet, id string) error {
+func (p *planet) Update(ctx context.Context, planet *model.Planet, id string) error {
 	oID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err

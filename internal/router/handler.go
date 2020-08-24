@@ -97,7 +97,7 @@ func (p *PlanetHandler) FindByName(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 }
-func (p *PlanetHandler) UpdateById(w http.ResponseWriter, r *http.Request) {
+func (p *PlanetHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	var planetIn model.PlanetIn
@@ -109,7 +109,7 @@ func (p *PlanetHandler) UpdateById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = p.service.UpdateById(context.Background(), planetIn, vars["id"])
+	err = p.service.Update(context.Background(), planetIn, vars["id"])
 	if err != nil {
 		log.Println("Error updating the planet", err)
 		w.WriteHeader(http.StatusBadRequest)

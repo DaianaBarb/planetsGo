@@ -10,7 +10,7 @@ type Planet interface {
 	Save(parentContext context.Context, planet *model.PlanetIn) (string, error)
 	FindAll(ctx context.Context) ([]model.PlanetOut, error)
 	DeleteById(ctx context.Context, id string) error
-	UpdateById(ctx context.Context, p model.PlanetIn, id string) error
+	Update(ctx context.Context, p model.PlanetIn, id string) error
 	FindById(ctx context.Context, id string) (*model.PlanetOut, error)
 	FindByName(ctx context.Context, name string) ([]model.PlanetOut, error)
 }
@@ -67,10 +67,10 @@ func (s *planet) DeleteById(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *planet) UpdateById(ctx context.Context, p model.PlanetIn, id string) error {
+func (s *planet) Update(ctx context.Context, p model.PlanetIn, id string) error {
 	planet := p.ToPlanet()
 
-	err := s.dao.UpdateById(ctx, planet, id)
+	err := s.dao.Update(ctx, planet, id)
 	if err != nil {
 		return err
 	}

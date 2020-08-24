@@ -296,7 +296,7 @@ func Test_planet_UpdateById(t *testing.T) {
 			want:    errors.New("erro ao fazer update"),
 			wantErr: true,
 			mock: func(repository *mocks.Planet) {
-				repository.On("UpdateById", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("erro ao fazer update"))
+				repository.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("erro ao fazer update"))
 			},
 		},
 	}
@@ -307,7 +307,7 @@ func Test_planet_UpdateById(t *testing.T) {
 				dao:   tt.fields.dao,
 				swapi: tt.fields.swapi,
 			}
-			if err := s.UpdateById(tt.args.ctx, tt.args.p, tt.args.id); (err != nil) != tt.wantErr {
+			if err := s.Update(tt.args.ctx, tt.args.p, tt.args.id); (err != nil) != tt.wantErr {
 				t.Errorf("UpdateById() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			tt.fields.dao.AssertExpectations(t)

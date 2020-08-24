@@ -119,7 +119,7 @@ func (_m *Planet) Save(parentContext context.Context, planet *model.PlanetIn) (s
 }
 
 // UpdateById provides a mock function with given fields: ctx, p, id
-func (_m *Planet) UpdateById(ctx context.Context, p model.PlanetIn, id string) error {
+func (_m *Planet) Update(ctx context.Context, p model.PlanetIn, id string) error {
 	ret := _m.Called(ctx, p, id)
 
 	var r0 error
