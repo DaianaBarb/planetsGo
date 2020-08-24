@@ -117,7 +117,7 @@ func TestPlanetHandler_DeleteById(t *testing.T) {
 			},
 			wantHttpStatusCode: http.StatusNotFound,
 			mock: func(fs *mocks.Planet) {
-				fs.On("DeleteById", mock.Anything, mock.Anything).Return(errors.New("n encontrado")).Once()
+				fs.On("DeleteById", mock.Anything, mock.Anything).Return(errors.New("not found")).Once()
 			}},
 	}
 	for _, tt := range tests {
@@ -158,6 +158,15 @@ func TestPlanetHandler_GetAll(t *testing.T) {
 			wantHttpStatusCode: http.StatusOK,
 			mock: func(fs *mocks.Planet) {
 				fs.On("FindAll", mock.Anything, mock.Anything).Return(planets, nil).Once()
+			}},
+		{name: "return 500 server error",
+			fields: fields{
+				service: new(mocks.Planet),
+			},
+
+			wantHttpStatusCode: http.StatusInternalServerError,
+			mock: func(fs *mocks.Planet) {
+				fs.On("FindAll", mock.Anything, mock.Anything).Return(nil, errors.New("server error")).Once()
 			}},
 	}
 	for _, tt := range tests {
@@ -263,7 +272,7 @@ func TestPlanetHandler_FindById(t *testing.T) {
 			},
 			wantHttpStatusCode: http.StatusNotFound,
 			mock: func(fs *mocks.Planet) {
-				fs.On("FindById", mock.Anything, mock.Anything).Return(nil, errors.New("n encontrado")).Once()
+				fs.On("FindById", mock.Anything, mock.Anything).Return(nil, errors.New("not found ")).Once()
 			}},
 	}
 	for _, tt := range tests {
