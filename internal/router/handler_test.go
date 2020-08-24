@@ -225,9 +225,8 @@ func TestPlanetHandler_Update(t *testing.T) {
 			},
 			wantHttpStatusCode: http.StatusNotFound,
 			mock: func(fs *mocks.Planet) {
-				fs.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("n encontrado")).Once()
+				fs.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("not found")).Once()
 			}},
-		{},
 	}
 	for _, tt := range tests {
 		tt.mock(tt.fields.service)

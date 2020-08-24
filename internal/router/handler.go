@@ -97,17 +97,18 @@ func (p *PlanetHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	var planetIn model.PlanetIn
-	err := json.NewDecoder(r.Body).Decode(&planetIn)
+	json.NewDecoder(r.Body).Decode(&planetIn)
 
-	if err != nil {
-		log.Println("Error Decoding the planet", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	//if err != nil {
+	//log.Println("Error Decoding the planet", err)
+	//	w.WriteHeader(http.StatusInternalServerError)
+	//	return
+	//}
 
-	err = p.service.Update(context.Background(), planetIn, vars["id"])
-	if err != nil {
-		log.Println("Error updating the planet", err)
+	planet := p.service.Update(context.Background(), planetIn, vars["id"])
+
+	if planet != nil {
+		log.Println("Error updating the planet", planet)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
