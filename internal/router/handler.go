@@ -108,7 +108,7 @@ func (p *PlanetHandler) Update(w http.ResponseWriter, r *http.Request) {
 	err = p.service.Update(context.Background(), planetIn, vars["id"])
 	if err != nil {
 		log.Println("Error updating the planet", err)
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 

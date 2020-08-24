@@ -215,6 +215,19 @@ func TestPlanetHandler_Update(t *testing.T) {
 			mock: func(fs *mocks.Planet) {
 				fs.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 			}},
+		{name: "return 404 not found",
+			fields: fields{
+				service: new(mocks.Planet),
+			},
+			args: args{
+				id:   mock.Anything,
+				body: strings.NewReader(`{"name":"mock", "climate":"mock", "terrain":"mock"}`),
+			},
+			wantHttpStatusCode: http.StatusNotFound,
+			mock: func(fs *mocks.Planet) {
+				fs.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("n encontrado")).Once()
+			}},
+		{},
 	}
 	for _, tt := range tests {
 		tt.mock(tt.fields.service)
@@ -232,6 +245,7 @@ func TestPlanetHandler_Update(t *testing.T) {
 			tt.fields.service.AssertExpectations(t)
 		})
 	}
+
 }
 
 func TestPlanetHandler_FindById(t *testing.T) {
