@@ -1,6 +1,7 @@
 package router
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -106,6 +107,17 @@ func TestPlanetHandler_DeleteById(t *testing.T) {
 			wantHttpStatusCode: http.StatusOK,
 			mock: func(fs *mocks.Planet) {
 				fs.On("DeleteById", mock.Anything, mock.Anything).Return(nil).Once()
+			}},
+		{name: "return 404 not found",
+			fields: fields{
+				service: new(mocks.Planet),
+			},
+			args: args{
+				id: mock.Anything,
+			},
+			wantHttpStatusCode: http.StatusNotFound,
+			mock: func(fs *mocks.Planet) {
+				fs.On("DeleteById", mock.Anything, mock.Anything).Return(errors.New("n encontrado")).Once()
 			}},
 	}
 	for _, tt := range tests {
