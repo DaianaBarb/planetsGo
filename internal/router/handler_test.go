@@ -254,6 +254,17 @@ func TestPlanetHandler_FindById(t *testing.T) {
 			mock: func(fs *mocks.Planet) {
 				fs.On("FindById", mock.Anything, mock.Anything).Return(planet, nil).Once()
 			}},
+		{name: "return 404 not found",
+			fields: fields{
+				service: new(mocks.Planet),
+			},
+			args: args{
+				id: mock.Anything,
+			},
+			wantHttpStatusCode: http.StatusNotFound,
+			mock: func(fs *mocks.Planet) {
+				fs.On("FindById", mock.Anything, mock.Anything).Return(nil, errors.New("n encontrado")).Once()
+			}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -64,12 +64,8 @@ func (p *PlanetHandler) FindById(w http.ResponseWriter, r *http.Request) {
 	planet, err := p.service.FindById(context.Background(), vars["id"])
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if planet == nil {
 		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	encoder := json.NewEncoder(w)
