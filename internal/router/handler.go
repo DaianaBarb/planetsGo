@@ -8,6 +8,10 @@ import (
 	"net/http"
 	"projeto-star-wars-api-go/internal/model"
 	"projeto-star-wars-api-go/internal/service"
+	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-playground/validator/v10"
@@ -132,6 +136,17 @@ func (p *PlanetHandler) DeleteById(w http.ResponseWriter, r *http.Request) {
 	err := p.service.DeleteById(context.Background(), vars["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	return
+}
+
+func (p *PlanetHandler) Healthcheck(w http.ResponseWriter, r *http.Request) {
+
+	error := GetDatabase()
+	if error != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusOK)
 }
@@ -144,4 +159,19 @@ func ValidateStruct(v *model.PlanetIn) error {
 		return errs
 	}
 	return nil
+}
+
+func GetDatabase() error {
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
+	client, err := mongo.Connect(context.Background(), clientOptions)
+	if err != nil {
+		return err
+	}
+	errr := client.Ping(ctx, nil)
+	if errr != nil {
+		return errr
+	}
+	return nil
+
 }
