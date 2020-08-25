@@ -110,7 +110,11 @@ func (p *PlanetHandler) Update(w http.ResponseWriter, r *http.Request) {
 	//	w.WriteHeader(http.StatusInternalServerError)
 	//	return
 	//}
-
+	error := ValidateStruct(&planetIn)
+	if error != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
 	planet := p.service.Update(context.Background(), planetIn, vars["id"])
 
 	if planet != nil {
