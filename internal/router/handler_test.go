@@ -59,6 +59,32 @@ func TestPlanetHandler_SavePlanet(t *testing.T) {
 				fs.On("Save", mock.Anything, mock.Anything).Maybe().Times(0)
 			},
 		},
+		{
+			name: "return 422 when don't send the fild",
+			fields: fields{
+				service: new(mocks.Planet),
+			},
+			args: args{
+				body: strings.NewReader(`{"name":"", "climate":"mock", "terrain":"mock"}`),
+			},
+			wantHttpStatusCode: http.StatusUnprocessableEntity,
+			mock: func(fs *mocks.Planet) {
+				fs.On("Save", mock.Anything, mock.Anything).Maybe().Times(0)
+			},
+		},
+		{
+			name: "return 422 when send the fild with number",
+			fields: fields{
+				service: new(mocks.Planet),
+			},
+			args: args{
+				body: strings.NewReader(`{"name":0909, "climate":"mock", "terrain":0000}`),
+			},
+			wantHttpStatusCode: http.StatusUnprocessableEntity,
+			mock: func(fs *mocks.Planet) {
+				fs.On("Save", mock.Anything, mock.Anything).Maybe().Times(0)
+			},
+		},
 	}
 	for _, tt := range tests {
 		tt.mock(tt.fields.service)
