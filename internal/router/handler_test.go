@@ -259,11 +259,11 @@ func TestPlanetHandler_Update(t *testing.T) {
 			},
 			args: args{
 				id:   id.Hex(),
-				body: strings.NewReader(`{"name":9000, "climate":"mock", "terrain":"mock"}`),
+				body: strings.NewReader(`{"name":"", "climate":"mock", "terrain":"mock"}`),
 			},
 			wantHttpStatusCode: http.StatusUnprocessableEntity,
 			mock: func(fs *mocks.Planet) {
-				fs.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("field null")).Once()
+				fs.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("field null")).Maybe().Times(0)
 			}},
 	}
 	for _, tt := range tests {
