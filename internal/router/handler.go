@@ -9,6 +9,8 @@ import (
 	"projeto-star-wars-api-go/internal/model"
 	"projeto-star-wars-api-go/internal/service"
 
+	"github.com/go-playground/validator/v10"
+	_ "github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 )
 
@@ -31,7 +33,11 @@ func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
-
+	error := ValidateStruct(&in)
+	if error != nil {
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
 	hexId, err := p.service.Save(context.Background(), &in)
 
 	if err != nil {
@@ -124,4 +130,14 @@ func (p *PlanetHandler) DeleteById(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 	}
 	w.WriteHeader(http.StatusOK)
+}
+func ValidateStruct(v *model.PlanetIn) error {
+	var validate *validator.Validate
+	validate = validator.New()
+
+	errs := validate.Struct(v)
+	if errs != nil {
+		return errs
+	}
+	return nil
 }
