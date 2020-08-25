@@ -246,12 +246,24 @@ func TestPlanetHandler_Update(t *testing.T) {
 				service: new(mocks.Planet),
 			},
 			args: args{
-				id:   mock.Anything,
+				id:   id.Hex(),
 				body: strings.NewReader(`{"name":"mock", "climate":"mock", "terrain":"mock"}`),
 			},
 			wantHttpStatusCode: http.StatusNotFound,
 			mock: func(fs *mocks.Planet) {
 				fs.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("not found")).Once()
+			}},
+		{name: "return 422 not unoprocessable entity",
+			fields: fields{
+				service: new(mocks.Planet),
+			},
+			args: args{
+				id:   id.Hex(),
+				body: strings.NewReader(`{"name":9000, "climate":"mock", "terrain":"mock"}`),
+			},
+			wantHttpStatusCode: http.StatusUnprocessableEntity,
+			mock: func(fs *mocks.Planet) {
+				fs.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("field null")).Once()
 			}},
 	}
 	for _, tt := range tests {
