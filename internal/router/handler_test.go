@@ -183,7 +183,7 @@ func TestPlanetHandler_GetAll(t *testing.T) {
 			},
 			wantHttpStatusCode: http.StatusOK,
 			mock: func(fs *mocks.Planet) {
-				fs.On("FindAll", mock.Anything, mock.Anything).Return(planets, nil).Once()
+				fs.On("FindByParam", mock.Anything, mock.Anything).Return(planets, nil).Once()
 			}},
 		{name: "return 500 server error",
 			fields: fields{
@@ -192,7 +192,7 @@ func TestPlanetHandler_GetAll(t *testing.T) {
 
 			wantHttpStatusCode: http.StatusInternalServerError,
 			mock: func(fs *mocks.Planet) {
-				fs.On("FindAll", mock.Anything, mock.Anything).Return(nil, errors.New("server error")).Once()
+				fs.On("FindByParam", mock.Anything, mock.Anything).Return(nil, errors.New("server error")).Once()
 			}},
 	}
 	for _, tt := range tests {
@@ -202,6 +202,46 @@ func TestPlanetHandler_GetAll(t *testing.T) {
 				service: tt.fields.service,
 			}
 			request := httptest.NewRequest(http.MethodGet, "/planets", nil)
+			recorder := httptest.NewRecorder()
+
+			p.FindAll(recorder, request)
+
+			assert.Equal(t, tt.wantHttpStatusCode, recorder.Code)
+
+			tt.fields.service.AssertExpectations(t)
+		})
+	}
+}
+
+func TestPlanetHandler_GetAll2(t *testing.T) {
+	var planets []model.PlanetOut
+	type fields struct {
+		service *mocks.Planet
+	}
+
+	tests := []struct {
+		name               string
+		fields             fields
+		wantHttpStatusCode int
+		mock               func(fs *mocks.Planet)
+	}{
+		{
+			name: "sucesss",
+			fields: fields{
+				service: new(mocks.Planet),
+			},
+			wantHttpStatusCode: http.StatusOK,
+			mock: func(fs *mocks.Planet) {
+				fs.On("FindByParam", mock.Anything, mock.Anything).Return(planets, nil).Once()
+			}},
+	}
+	for _, tt := range tests {
+		tt.mock(tt.fields.service)
+		t.Run(tt.name, func(t *testing.T) {
+			p := &PlanetHandler{
+				service: tt.fields.service,
+			}
+			request := httptest.NewRequest(http.MethodGet, "/planets?name=Tatooine&terrain=Solid", nil)
 			recorder := httptest.NewRecorder()
 
 			p.FindAll(recorder, request)

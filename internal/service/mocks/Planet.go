@@ -74,13 +74,13 @@ func (_m *Planet) FindById(ctx context.Context, id string) (*model.PlanetOut, er
 	return r0, r1
 }
 
-// FindByName provides a mock function with given fields: ctx, name
-func (_m *Planet) FindByName(ctx context.Context, name string) ([]model.PlanetOut, error) {
-	ret := _m.Called(ctx, name)
+// FindByParam provides a mock function with given fields: ctx, param
+func (_m *Planet) FindByParam(ctx context.Context, param *model.PlanetIn) ([]model.PlanetOut, error) {
+	ret := _m.Called(ctx, param)
 
 	var r0 []model.PlanetOut
-	if rf, ok := ret.Get(0).(func(context.Context, string) []model.PlanetOut); ok {
-		r0 = rf(ctx, name)
+	if rf, ok := ret.Get(0).(func(context.Context, *model.PlanetIn) []model.PlanetOut); ok {
+		r0 = rf(ctx, param)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]model.PlanetOut)
@@ -88,8 +88,8 @@ func (_m *Planet) FindByName(ctx context.Context, name string) ([]model.PlanetOu
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, name)
+	if rf, ok := ret.Get(1).(func(context.Context, *model.PlanetIn) error); ok {
+		r1 = rf(ctx, param)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -118,7 +118,7 @@ func (_m *Planet) Save(parentContext context.Context, planet *model.PlanetIn) (s
 	return r0, r1
 }
 
-// UpdateById provides a mock function with given fields: ctx, p, id
+// Update provides a mock function with given fields: ctx, p, id
 func (_m *Planet) Update(ctx context.Context, p model.PlanetIn, id string) error {
 	ret := _m.Called(ctx, p, id)
 
