@@ -42,6 +42,9 @@ func main() {
 }
 
 func getDatabase() (*mongo.Database, error) {
+	// usar essa linha a baixo quando for utilizar o docker file e apagar a linha posterior
+	//clientOptions := options.Client().ApplyURI("mongodb://mongo-star")
+
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/")
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
