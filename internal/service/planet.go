@@ -12,7 +12,7 @@ type Planet interface {
 	DeleteById(ctx context.Context, id string) error
 	Update(ctx context.Context, p model.PlanetIn, id string) error
 	FindById(ctx context.Context, id string) (*model.PlanetOut, error)
-	FindByName(ctx context.Context, name string) ([]model.PlanetOut, error)
+	FindByParam(ctx context.Context, param *model.PlanetIn) ([]model.PlanetOut, error)
 }
 
 type planet struct {
@@ -96,9 +96,9 @@ func (s *planet) FindById(ctx context.Context, id string) (*model.PlanetOut, err
 	return planetOut, nil
 }
 
-func (s *planet) FindByName(ctx context.Context, name string) ([]model.PlanetOut, error) {
+func (s *planet) FindByParam(ctx context.Context, param *model.PlanetIn) ([]model.PlanetOut, error) {
 
-	planets, err := s.dao.FindByName(ctx, name)
+	planets, err := s.dao.FindByParam(ctx, param)
 	if err != nil {
 		return nil, err
 	}

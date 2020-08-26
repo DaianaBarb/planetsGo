@@ -17,7 +17,7 @@ type Planet interface {
 	DeleteById(ctx context.Context, id string) error
 	Update(ctx context.Context, p *model.Planet, id string) error
 	FindById(ctx context.Context, id string) (*model.Planet, error)
-	FindByName(ctx context.Context, name string) ([]model.Planet, error)
+	FindByParam(ctx context.Context, param *model.PlanetIn) ([]model.Planet, error)
 }
 
 type planet struct {
@@ -116,8 +116,11 @@ func (p *planet) FindById(ctx context.Context, id string) (*model.Planet, error)
 	return ToPlanet(doc), nil
 }
 
-func (p *planet) FindByName(ctx context.Context, name string) ([]model.Planet, error) {
-	result, err := p.collection.Find(ctx, bson.M{"name": name})
+func (p *planet) FindByParam(ctx context.Context, param *model.PlanetIn) ([]model.Planet, error) {
+
+	filter := p.getFilter(param)
+
+	result, err := p.collection.Find(ctx, filter)
 	if err != nil { // se o erro nao for nulo
 		return nil, err
 	}
@@ -137,6 +140,23 @@ func (p *planet) FindByName(ctx context.Context, name string) ([]model.Planet, e
 	}
 
 	return planets, nil
+}
+func (p *planet) getFilter(params *model.PlanetIn) bson.D {
+	filter := bson.D{}
+
+	filter = p.appendFilter("name", params.Name, &filter)
+	filter = p.appendFilter("climate", params.Climate, &filter)
+	filter = p.appendFilter("terrain", params.Terrain, &filter)
+
+	return filter
+
+}
+func (p *planet) appendFilter(field, value string, filter *bson.D) bson.D {
+	if len(value) > 0 {
+		*filter = append(*filter, bson.E{Key: field, Value: value})
+	}
+
+	return *filter
 }
 func ToPlanet(p document.Planet) *model.Planet {
 

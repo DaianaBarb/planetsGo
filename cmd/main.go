@@ -33,9 +33,9 @@ func main() {
 	router.HandleFunc("/planets/{id}", handler.DeleteById).Methods("DELETE")
 	router.HandleFunc("/planets/{id}", handler.Update).Methods("PUT")
 	router.HandleFunc("/planets", handler.SavePlanet).Methods("POST")
-	router.HandleFunc("/planets", handler.FindAll).Methods("GET")
+	router.HandleFunc("/planets", handler.FindAll).Methods("GET").Queries()
 	router.HandleFunc("/planets/{id}", handler.FindById).Methods("GET")
-	router.HandleFunc("/planets/", handler.FindByName).Methods("GET").Queries("name", "")
+	//router.HandleFunc("/planets/", handler.FindByName).Methods("GET").Queries("name", "")
 	router.HandleFunc("/health", handler.Healthcheck).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080", router))

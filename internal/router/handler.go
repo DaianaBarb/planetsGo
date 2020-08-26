@@ -56,7 +56,17 @@ func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
 func (p *PlanetHandler) FindAll(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	//ctx, _ := context.WithTimeout(context.Background(), 20*time.Second)
-	planets, err := p.service.FindAll(context.Background())
+
+	planetName := r.URL.Query().Get("name")
+	planetClimate := r.URL.Query().Get("climate")
+	planetTerrain := r.URL.Query().Get("terrain")
+
+	var planetParam *model.PlanetIn
+	planetParam.Name = planetName
+	planetParam.Climate = planetClimate
+	planetTerrain = planetTerrain
+
+	planets, err := p.service.FindByParam(context.Background(), planetParam)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -83,26 +93,6 @@ func (p *PlanetHandler) FindById(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (p *PlanetHandler) FindByName(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	planetName := r.URL.Query().Get("name")
-	planets, err := p.service.FindByName(context.Background(), planetName)
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if len(planets) == 0 {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	encoder := json.NewEncoder(w)
-	encoder.Encode(planets)
-	w.WriteHeader(http.StatusOK)
-
-}
 func (p *PlanetHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
