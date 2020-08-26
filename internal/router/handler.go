@@ -61,12 +61,11 @@ func (p *PlanetHandler) FindAll(w http.ResponseWriter, r *http.Request) {
 	planetClimate := r.URL.Query().Get("climate")
 	planetTerrain := r.URL.Query().Get("terrain")
 
-	var planetParam *model.PlanetIn
-	planetParam.Name = planetName
-	planetParam.Climate = planetClimate
-	planetParam.Terrain = planetTerrain
-
-	planets, err := p.service.FindByParam(context.Background(), planetParam)
+	planets, err := p.service.FindByParam(context.Background(), &model.PlanetIn{
+		Name:    planetName,
+		Climate: planetClimate,
+		Terrain: planetTerrain,
+	})
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
