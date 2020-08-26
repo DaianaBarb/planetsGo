@@ -64,7 +64,7 @@ func (p *PlanetHandler) FindAll(w http.ResponseWriter, r *http.Request) {
 	var planetParam *model.PlanetIn
 	planetParam.Name = planetName
 	planetParam.Climate = planetClimate
-	planetTerrain = planetTerrain
+	planetParam.Terrain = planetTerrain
 
 	planets, err := p.service.FindByParam(context.Background(), planetParam)
 
