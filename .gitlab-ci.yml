@@ -11,7 +11,7 @@ stages:
   - deploy
 
 variables:
-  SERVICE_NAME: "awesome-service"
+  SERVICE_NAME: "api"
 
 before_script:
   - export GOPATH=${CI_PROJECT_DIR}/.cache
