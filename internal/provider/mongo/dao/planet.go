@@ -24,7 +24,7 @@ type planet struct {
 	collection *mongo.Collection
 }
 
-func NewMongoPlanet(db *mongo.Database) Planet {
+func NewMongoPlanet(db *mongo.Database) Planet { //retorna a interface
 	return &planet{collection: db.Collection("planet")}
 }
 

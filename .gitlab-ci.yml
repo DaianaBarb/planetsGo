@@ -1,0 +1,75 @@
+
+
+image: golang:1.13
+
+services:
+  - docker:dind
+stages:
+  - build
+  - check
+  - push
+  - deploy
+
+variables:
+  SERVICE_NAME: "awesome-service"
+
+before_script:
+  - export GOPATH=${CI_PROJECT_DIR}/.cache
+  - export PATH="${PATH}:${GOPATH}/bin"
+
+Build application:
+  stage: build
+  tags:
+    - docker
+  cache: &build_cache
+    key: build
+    paths:
+      - .cache
+  artifacts:
+    expire_in: 2hr
+    paths:
+      - ${SERVICE_NAME}
+  script:
+    - mkdir -p .cache
+    - CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo ./cmd/${SERVICE_NAME}/
+
+Test application:
+  stage: check
+  cache:
+    <<: *build_cache
+    policy: pull
+  tags:
+    - docker
+  script:
+    - make test
+
+Check application:
+  stage: check
+  cache:
+    <<: *build_cache
+    policy: pull
+  tags:
+    - docker
+  script:
+    - make static_check
+
+Build stage image:
+  stage: push
+  tags:
+    - shell
+  before_script:
+    - docker login registry.gitlab.com -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}
+  script:
+    - docker build -t ${CI_REGISTRY}/${CI_PROJECT_PATH}:${CI_COMMIT_REF_NAME} .
+    - docker push ${CI_REGISTRY}/${CI_PROJECT_PATH}:${CI_COMMIT_REF_NAME}
+  after_script:
+    - docker logout ${CI_REGISTRY}
+
+Deploy:
+  stage: deploy
+  tags:
+    - shell
+  only:
+    - master
+  script:
+    - /bin/bash -c 'cd /opt/project && docker-compose pull ${SERVICE_NAME} && docker-compose up -d ${SERVICE_NAME} && exit'ript:
