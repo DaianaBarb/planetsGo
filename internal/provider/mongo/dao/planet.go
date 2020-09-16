@@ -4,6 +4,7 @@ import (
 	"context"
 	"projeto-star-wars-api-go/internal/model"
 	"projeto-star-wars-api-go/internal/provider/mongo/document"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -11,24 +12,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type Planet interface {
-	Save(parentContext context.Context, planet *model.Planet) (string, error)
-	FindAll(ctx context.Context) ([]model.Planet, error)
-	DeleteById(ctx context.Context, id string) error
-	Update(ctx context.Context, p *model.Planet, id string) error
-	FindById(ctx context.Context, id string) (*model.Planet, error)
-	FindByParam(ctx context.Context, param *model.PlanetIn) ([]model.Planet, error)
-}
-
-type planet struct {
+type Planet struct {
+	client     *mongo.Client
 	collection *mongo.Collection
 }
 
-func NewMongoPlanet(db *mongo.Database) Planet { //retorna a interface
-	return &planet{collection: db.Collection("planet")}
+func NewMongoPlanet(client *mongo.Client, db *mongo.Database) *Planet { //retorna a interface
+	return &Planet{client: client, collection: db.Collection("planet")}
 }
 
-func (p *planet) Save(parentContext context.Context, planet *model.Planet) (string, error) {
+func (p *Planet) Save(parentContext context.Context, planet *model.Planet) (string, error) {
 
 	doc := document.Planet{
 		Name:    planet.Name,
@@ -45,27 +38,7 @@ func (p *planet) Save(parentContext context.Context, planet *model.Planet) (stri
 	return inserted.Hex(), nil
 }
 
-func (p *planet) FindAll(ctx context.Context) ([]model.Planet, error) {
-	result, err := p.collection.Find(ctx, bson.M{})
-	if err != nil { // se o erro nao for nulo
-		return nil, err
-	} // se o erro for igual a a nullo ele n da erro. se o erro for nulo ele da erro
-
-	var documents []document.Planet // o erro tem que ser nullo para passar aqui e n retornar erro
-	err = result.All(ctx, &documents)
-	if err != nil {
-		return nil, err
-	}
-
-	var planets []model.Planet
-	for _, doc := range documents {
-		planet := ToPlanet(doc)
-		planets = append(planets, *planet)
-	}
-	return planets, err
-}
-
-func (p *planet) DeleteById(ctx context.Context, id string) error {
+func (p *Planet) DeleteById(ctx context.Context, id string) error {
 	oID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
@@ -79,7 +52,7 @@ func (p *planet) DeleteById(ctx context.Context, id string) error {
 	return nil
 }
 
-func (p *planet) Update(ctx context.Context, planet *model.Planet, id string) error {
+func (p *Planet) Update(ctx context.Context, planet *model.Planet, id string) error {
 	oID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
@@ -98,7 +71,7 @@ func (p *planet) Update(ctx context.Context, planet *model.Planet, id string) er
 	return nil
 }
 
-func (p *planet) FindById(ctx context.Context, id string) (*model.Planet, error) {
+func (p *Planet) FindById(ctx context.Context, id string) (*model.Planet, error) {
 
 	oID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -116,7 +89,7 @@ func (p *planet) FindById(ctx context.Context, id string) (*model.Planet, error)
 	return ToPlanet(doc), nil
 }
 
-func (p *planet) FindByParam(ctx context.Context, param *model.PlanetIn) ([]model.Planet, error) {
+func (p *Planet) FindByParam(ctx context.Context, param *model.PlanetIn) ([]model.Planet, error) {
 
 	filter := p.getFilter(param)
 
@@ -141,7 +114,7 @@ func (p *planet) FindByParam(ctx context.Context, param *model.PlanetIn) ([]mode
 
 	return planets, nil
 }
-func (p *planet) getFilter(params *model.PlanetIn) bson.D {
+func (p *Planet) getFilter(params *model.PlanetIn) bson.D {
 	filter := bson.D{}
 
 	filter = p.appendFilter("name", params.Name, &filter)
@@ -151,13 +124,18 @@ func (p *planet) getFilter(params *model.PlanetIn) bson.D {
 	return filter
 
 }
-func (p *planet) appendFilter(field, value string, filter *bson.D) bson.D {
+func (p *Planet) appendFilter(field, value string, filter *bson.D) bson.D {
 	if len(value) > 0 {
 		*filter = append(*filter, bson.E{Key: field, Value: value})
 	}
 
 	return *filter
 }
+func (p *Planet) Check(ctx context.Context) error {
+	ctx, _ = context.WithTimeout(ctx, time.Second)
+	return p.client.Ping(ctx, nil)
+}
+
 func ToPlanet(p document.Planet) *model.Planet {
 
 	return &model.Planet{

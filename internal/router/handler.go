@@ -6,12 +6,13 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"projeto-star-wars-api-go/internal/model"
-	"projeto-star-wars-api-go/internal/service"
-	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"projeto-star-wars-api-go/internal/model"
+	"projeto-star-wars-api-go/internal/service"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-playground/validator/v10"
@@ -22,15 +23,31 @@ type PlanetHandler struct {
 	service service.Planet
 }
 
+type HealthChecker interface {
+	Check(ctx context.Context) error
+}
+
+type HealthHandler struct {
+	hc HealthChecker
+}
+
 func NewPlanetHandler(service service.Planet) *PlanetHandler {
 	return &PlanetHandler{service: service}
 }
+
+func NewHealthHandler(hc HealthChecker) *HealthHandler {
+	return &HealthHandler{hc: hc}
+}
+
 func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
+
+	//Unmarsshal vc transforma o json em objeto
+	// Marshal vc trasforma o objeto em json
 	var in model.PlanetIn
 	err = json.Unmarshal(body, &in)
 	if err != nil {
@@ -47,33 +64,11 @@ func (p *PlanetHandler) SavePlanet(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
+
 	}
 	url := "http://localhost:8080/planets/" + hexId
 	w.Header().Add("location", url)
 	w.WriteHeader(http.StatusCreated)
-
-}
-func (p *PlanetHandler) FindAll(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	//ctx, _ := context.WithTimeout(context.Background(), 20*time.Second)
-
-	planetName := r.URL.Query().Get("name")
-	planetClimate := r.URL.Query().Get("climate")
-	planetTerrain := r.URL.Query().Get("terrain")
-
-	planets, err := p.service.FindByParam(context.Background(), &model.PlanetIn{
-		Name:    planetName,
-		Climate: planetClimate,
-		Terrain: planetTerrain,
-	})
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-
-	encoder := json.NewEncoder(w)
-	encoder.Encode(planets)
-	w.WriteHeader(http.StatusOK)
 
 }
 
@@ -130,15 +125,42 @@ func (p *PlanetHandler) DeleteById(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	return
 }
+func (p *PlanetHandler) FindByParam(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	//ctx, _ := context.WithTimeout(context.Background(), 20*time.Second)
 
-func (p *PlanetHandler) Healthcheck(w http.ResponseWriter, r *http.Request) {
+	planetName := r.URL.Query().Get("name")
+	planetClimate := r.URL.Query().Get("climate")
+	planetTerrain := r.URL.Query().Get("terrain")
 
-	error := GetDatabase()
+	planets, err := p.service.FindByParam(context.Background(), &model.PlanetIn{
+		Name:    planetName,
+		Climate: planetClimate,
+		Terrain: planetTerrain,
+	})
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	encoder := json.NewEncoder(w)
+	encoder.Encode(planets)
+	w.WriteHeader(http.StatusOK)
+	return
+
+}
+func (p *HealthHandler) Healthcheck(w http.ResponseWriter, r *http.Request) {
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
+
+	error := p.hc.Check(ctx)
+
 	if error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusOK)
 }
+
 func ValidateStruct(v *model.PlanetIn) error {
 	var validate *validator.Validate
 	validate = validator.New()

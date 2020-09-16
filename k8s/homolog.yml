@@ -1,0 +1,36 @@
+application:
+  name: star-wars
+  brand: daiana
+  flow: npf
+
+deployments:
+  container:
+    image:
+      repository: registry.b2w.io
+      namespace: b2wdigital
+      name: matrix-swapi-test
+    resources:
+      requests:
+        cpu: 0.2
+        memory: 512Mi
+      limit:
+        cpu: 0.2
+        memory: 512Mi
+    port: 8080
+    probe:
+      readiness:
+        initialDelay: 5
+        period: 5
+      liveness:
+        initialDelay: 5
+        period: 5
+
+expose:
+  hosts:
+    - host: star-wars-test-go.internal.b2w.io
+      paths:
+        - /*
+      ssl: false
+      public: false
+      config: {}
+

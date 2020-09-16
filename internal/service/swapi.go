@@ -8,6 +8,10 @@ import (
 	"strings"
 )
 
+type SwapiInterface interface {
+	CountPlanetAppearancesOnMovies(ctx context.Context, planetName string) (int, error)
+}
+
 type searchResponse struct {
 	Results []planetResponse `json:"results"`
 }
@@ -20,7 +24,7 @@ type SWAPI struct {
 	APIURL string
 }
 
-func NewSWAPI() SWAPI {
+func NewSWAPI() SwapiInterface {
 	return SWAPI{APIURL: "https://swapi.dev/api/planets"}
 }
 
